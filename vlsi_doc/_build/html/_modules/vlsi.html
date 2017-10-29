@@ -1,0 +1,306 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>vlsi &mdash; VLSI 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="VLSI 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">VLSI 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for vlsi</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python3</span>
+
+<span class="kn">import</span> <span class="nn">interval_tree</span> <span class="kn">as</span> <span class="nn">it</span>
+<span class="kn">import</span> <span class="nn">red_black_tree</span> <span class="kn">as</span> <span class="nn">rb</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="n">INFTY</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">14</span>
+
+<div class="viewcode-block" id="YNode"><a class="viewcode-back" href="../index.html#vlsi.YNode">[docs]</a><span class="k">class</span> <span class="nc">YNode</span><span class="p">(</span> <span class="n">it</span><span class="o">.</span><span class="n">IntervalNode</span> <span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">	Store a rectangle&#39;s Y-interval, with the L y-coordinate as a key.</span>
+
+<span class="sd">	:ivar rect: the rectangle, i.e. 4 coordinates</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">rect</span> <span class="p">):</span>
+
+		<span class="n">y1</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">rect</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">rect</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">it</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span> <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">))</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">rect</span> <span class="o">=</span> <span class="n">rect</span>
+</div>
+<div class="viewcode-block" id="XNode"><a class="viewcode-back" href="../index.html#vlsi.XNode">[docs]</a><span class="k">class</span> <span class="nc">XNode</span><span class="p">(</span> <span class="n">rb</span><span class="o">.</span><span class="n">rbNode</span> <span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Store a rectangle&#39;s X coordinate.</span>
+
+<span class="sd">	:ivar start: set to True if this is a L x-coordinate; False otherwise</span>
+<span class="sd">	:ivar rect: the rectangle, i.e. a 4-tuple of coordinates</span>
+<span class="sd">	:ivar interval: the corresponding Y-interval</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	
+<div class="viewcode-block" id="XNode.__init__"><a class="viewcode-back" href="../index.html#vlsi.XNode.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">rect</span><span class="p">,</span> <span class="n">high_x</span> <span class="o">=</span> <span class="bp">False</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Create a node for an x-coordinate.</span>
+
+<span class="sd">		:param rect: the rectangle coordinates (x1, y1, x2, y2)</span>
+<span class="sd">		:type rect: tuple</span>
+<span class="sd">		:param high_x: if True, use R x-coordinate as a key; use L-x coordinate otherwise</span>
+<span class="sd">		:type high_x: bool</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">rect</span>
+			
+		<span class="n">key</span> <span class="o">=</span> <span class="n">x2</span> <span class="k">if</span> <span class="n">high_x</span> <span class="k">else</span> <span class="n">x1</span>
+		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="bp">False</span> <span class="k">if</span> <span class="n">high_x</span> <span class="k">else</span> <span class="bp">True</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">Interval</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rect</span> <span class="o">=</span> <span class="n">rect</span>
+</div>
+	<span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="k">return</span> <span class="s">&#39;{}:{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="s">&#39;[&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="k">else</span> <span class="s">&#39;]&#39;</span><span class="p">)</span>
+		
+	<span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="XNode.sentinel"><a class="viewcode-back" href="../index.html#vlsi.XNode.sentinel">[docs]</a>	<span class="k">def</span> <span class="nf">sentinel</span><span class="p">():</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Create a sentinel node.</span>
+
+<span class="sd">		:return: a sentinel node, from a rectangle of infinite size</span>
+<span class="sd">		:rtype: XNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="n">XNode</span><span class="p">(</span> <span class="p">(</span><span class="n">INFTY</span><span class="p">,</span> <span class="n">INFTY</span><span class="p">,</span> <span class="n">INFTY</span><span class="p">,</span> <span class="n">INFTY</span> <span class="p">))</span>
+
+</div></div>
+<div class="viewcode-block" id="build_endpoints_schedule"><a class="viewcode-back" href="../index.html#vlsi.build_endpoints_schedule">[docs]</a><span class="k">def</span> <span class="nf">build_endpoints_schedule</span><span class="p">(</span> <span class="n">rectangles</span> <span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Build a sorted list of L and R x-coordinates for all rectangles. </span>
+
+<span class="sd">	:param rectangles: a list of 4-tuples of coordinates</span>
+<span class="sd">	:type rectangles: list</span>
+<span class="sd">	:return: a list of XNode objects</span>
+<span class="sd">	:rtype: list</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">low_x_tree</span> <span class="o">=</span> <span class="n">rb</span><span class="o">.</span><span class="n">RedBlackTree</span><span class="p">()</span>
+	<span class="k">for</span> <span class="n">rect</span> <span class="ow">in</span> <span class="n">rectangles</span><span class="p">:</span>
+		<span class="n">low_x_tree</span><span class="o">.</span><span class="n">rb_insert_node</span><span class="p">(</span> <span class="n">XNode</span><span class="p">(</span> <span class="n">rect</span> <span class="p">))</span>
+	<span class="n">left_endpoints</span> <span class="o">=</span> <span class="n">low_x_tree</span><span class="o">.</span><span class="n">inorder_walk</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span> <span class="n">XNode</span><span class="o">.</span><span class="n">sentinel</span><span class="p">()</span> <span class="p">]</span> 
+
+	<span class="c">#print([ &#39;{}&#39;.format(pt) for pt in left_endpoints], &quot;Size: &quot;, len(left_endpoints))</span>
+
+
+	<span class="n">high_x_tree</span> <span class="o">=</span> <span class="n">rb</span><span class="o">.</span><span class="n">RedBlackTree</span><span class="p">()</span>
+	<span class="k">for</span> <span class="n">rect</span> <span class="ow">in</span> <span class="n">rectangles</span><span class="p">:</span>
+		<span class="n">high_x_tree</span><span class="o">.</span><span class="n">rb_insert_node</span><span class="p">(</span> <span class="n">XNode</span><span class="p">(</span> <span class="n">rect</span><span class="p">,</span> <span class="n">high_x</span><span class="o">=</span><span class="bp">True</span> <span class="p">))</span>
+	<span class="n">right_endpoints</span> <span class="o">=</span> <span class="n">high_x_tree</span><span class="o">.</span><span class="n">inorder_walk</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span> <span class="n">XNode</span><span class="o">.</span><span class="n">sentinel</span><span class="p">()</span> <span class="p">]</span>
+
+	<span class="c">#print([ &#39;{}&#39;.format(pt) for pt in right_endpoints], len(right_endpoints))</span>
+	
+	<span class="c"># Merge the two sets of points</span>
+	<span class="n">pos_l</span><span class="p">,</span> <span class="n">pos_r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
+	<span class="n">schedule</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rectangles</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">schedule</span><span class="p">)):</span>
+		<span class="c"># L endpoints comes first</span>
+		<span class="k">if</span> <span class="n">left_endpoints</span><span class="p">[</span> <span class="n">pos_l</span> <span class="p">]</span><span class="o">.</span><span class="n">key</span> <span class="o">&lt;=</span> <span class="n">right_endpoints</span><span class="p">[</span> <span class="n">pos_r</span> <span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
+			<span class="n">schedule</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">left_endpoints</span><span class="p">[</span> <span class="n">pos_l</span> <span class="p">]</span>
+			<span class="n">pos_l</span> <span class="o">+=</span> <span class="mi">1</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">schedule</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">right_endpoints</span><span class="p">[</span> <span class="n">pos_r</span> <span class="p">]</span>
+			<span class="n">pos_r</span> <span class="o">+=</span> <span class="mi">1</span>
+		<span class="c">#print(&#39;{}&#39;.format([ (&#39;{}&#39;.format(pt) if not None else &#39;&#39;) for pt in schedule ]))</span>
+
+	<span class="k">return</span> <span class="n">schedule</span>
+			
+		</div>
+<div class="viewcode-block" id="has_overlap"><a class="viewcode-back" href="../index.html#vlsi.has_overlap">[docs]</a><span class="k">def</span> <span class="nf">has_overlap</span><span class="p">(</span> <span class="n">rectangles</span> <span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">	Test whether a set of rectangles contain at least 2 overlapping elements.</span>
+
+<span class="sd">	:param rectangles: a list of 4-tuples of coordinates</span>
+<span class="sd">	:type rectangles: list</span>
+<span class="sd">	:return: True if the set contains at least 2 overlapping elements; False otherwise</span>
+<span class="sd">	:rtype: bool</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">schedule</span> <span class="o">=</span> <span class="n">build_endpoints_schedule</span><span class="p">(</span> <span class="n">rectangles</span> <span class="p">)</span>
+
+	<span class="c"># Store the Y-intervals</span>
+	<span class="n">y_tree</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">IntervalTree</span><span class="p">()</span>
+
+	<span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">schedule</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">pt</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+			<span class="n">found</span> <span class="o">=</span> <span class="n">y_tree</span><span class="o">.</span><span class="n">search_overlap</span><span class="p">(</span> <span class="n">pt</span><span class="o">.</span><span class="n">interval</span> <span class="p">)</span>
+			<span class="k">if</span> <span class="n">found</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">y_tree</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+				<span class="k">return</span> <span class="bp">True</span>
+			<span class="n">y_tree</span><span class="o">.</span><span class="n">insert_node</span><span class="p">(</span> <span class="n">YNode</span><span class="p">(</span> <span class="n">pt</span><span class="o">.</span><span class="n">rect</span> <span class="p">))</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">y_tree</span><span class="o">.</span><span class="n">delete_interval</span><span class="p">(</span> <span class="n">pt</span><span class="o">.</span><span class="n">interval</span> <span class="p">)</span>
+	
+	<span class="k">return</span> <span class="bp">False</span>
+
+		
+</div>
+<span class="k">class</span> <span class="nc">VLSI_UniTest</span><span class="p">(</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span> <span class="p">):</span>
+
+	<span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+
+		<span class="c"># non-overlapping rectangles</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span> <span class="o">=</span> <span class="p">[</span> 
+			<span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mf">1.5</span><span class="p">,</span><span class="mi">16</span><span class="p">),</span> <span class="c"># 0</span>
+			<span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span>     
+			<span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">14</span><span class="p">),</span>     
+			<span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span>    
+			<span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">13</span><span class="p">),</span>
+			<span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mf">13.5</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">15</span><span class="p">),</span> <span class="c"># 5</span>
+			<span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">21</span><span class="p">,</span><span class="mi">12</span><span class="p">),</span>
+			<span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span>
+			<span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">7</span><span class="p">),</span>
+			<span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">19</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span>
+			<span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mf">18.5</span><span class="p">,</span><span class="mi">18</span><span class="p">),</span> <span class="c"># 10</span>
+			<span class="p">(</span><span class="mf">16.5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mf">18.5</span><span class="p">,</span><span class="mf">7.5</span><span class="p">),</span>
+			<span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mf">3.5</span><span class="p">,</span><span class="mi">21</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span>
+			<span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="mi">27</span><span class="p">,</span><span class="mi">19</span><span class="p">),</span>
+			<span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">17</span><span class="p">),</span>
+			<span class="p">(</span><span class="mi">26</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">27</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span>
+			<span class="p">]</span>
+
+	<span class="k">def</span> <span class="nf">test_non_overlapping</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Non overlapping rectangles&quot;</span><span class="p">)</span>
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span> <span class="p">)</span> <span class="p">)</span>
+
+	
+	<span class="k">def</span> <span class="nf">test_overlapping_1</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Test 1&quot;</span><span class="p">)</span>
+
+		<span class="n">overlapping_rectangles_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span><span class="p">[:]</span>
+		<span class="n">overlapping_rectangles_1</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">17.5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mf">19.5</span><span class="p">,</span> <span class="mf">8.5</span> <span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="n">overlapping_rectangles_1</span> <span class="p">))</span>
+			
+	
+	<span class="k">def</span> <span class="nf">test_overlapping_2</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Test 2&quot;</span><span class="p">)</span>
+		<span class="n">overlapping_rectangles_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span><span class="p">[:]</span>
+		<span class="n">overlapping_rectangles_2</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mf">13.5</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="n">overlapping_rectangles_2</span> <span class="p">))</span>
+
+	<span class="k">def</span> <span class="nf">test_overlapping_3</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Test 3&quot;</span><span class="p">)</span>
+		<span class="n">overlapping_rectangles_3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span><span class="p">[:]</span>
+		<span class="n">overlapping_rectangles_3</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mf">18.5</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="n">overlapping_rectangles_3</span> <span class="p">))</span>
+
+
+	<span class="k">def</span> <span class="nf">test_overlapping_4</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Test 4&quot;</span><span class="p">)</span>
+		<span class="n">overlapping_rectangles_4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span><span class="p">[:]</span>
+		<span class="n">overlapping_rectangles_4</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mf">15.5</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">17</span><span class="p">)</span>
+		<span class="n">overlapping_rectangles_4</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4.5</span><span class="p">,</span><span class="mf">13.5</span><span class="p">,</span><span class="mi">21</span><span class="p">,</span><span class="mi">19</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="n">overlapping_rectangles_4</span> <span class="p">))</span>
+
+	
+	<span class="k">def</span> <span class="nf">test_overlapping_5</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Rectangles touch, but do not overlap &quot;&quot;&quot;</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Touching rectangles&quot;</span><span class="p">)</span>
+		<span class="n">overlapping_rectangles_5</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span><span class="p">[:]</span>
+		<span class="n">overlapping_rectangles_5</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">8</span> <span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="n">overlapping_rectangles_5</span> <span class="p">))</span>
+			
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+        <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+        <span class="n">main</span><span class="p">()</span>
+
+
+	
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">VLSI 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, NPR.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

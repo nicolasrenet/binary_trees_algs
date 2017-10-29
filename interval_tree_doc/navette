@@ -1,0 +1,8 @@
+.. automodule:: interval_tree
+.. autoclass:: Interval
+	:members:
+.. autoclass:: IntervalNode
+	:members:
+.. autoclass:: IntervalTree
+	:members:
+

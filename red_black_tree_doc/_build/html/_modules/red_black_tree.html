@@ -1,0 +1,499 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>red_black_tree &mdash; Red-Black Trees 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Red-Black Trees 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Red-Black Trees 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for red_black_tree</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python3</span>
+
+<span class="kn">import</span> <span class="nn">binary_tree</span> <span class="kn">as</span> <span class="nn">bt</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+
+<div class="viewcode-block" id="Color"><a class="viewcode-back" href="../index.html#red_black_tree.Color">[docs]</a><span class="k">class</span> <span class="nc">Color</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+	<span class="n">BLACK</span><span class="o">=</span><span class="mi">0</span>
+	<span class="n">RED</span><span class="o">=</span><span class="mi">1</span>
+		
+		</div>
+<div class="viewcode-block" id="rbNode"><a class="viewcode-back" href="../index.html#red_black_tree.rbNode">[docs]</a><span class="k">class</span> <span class="nc">rbNode</span><span class="p">(</span> <span class="n">bt</span><span class="o">.</span><span class="n">Node</span> <span class="p">):</span>
+
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
+		
+		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">key</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+	</div>
+<div class="viewcode-block" id="RedBlackTree"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree">[docs]</a><span class="k">class</span> <span class="nc">RedBlackTree</span><span class="p">(</span> <span class="n">bt</span><span class="o">.</span><span class="n">BinaryTree</span> <span class="p">):</span>
+
+
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">nil</span> <span class="o">=</span> <span class="n">rbNode</span><span class="p">(</span><span class="s">&quot;n&quot;</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span>
+
+
+<div class="viewcode-block" id="RedBlackTree.left_rotate"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree.left_rotate">[docs]</a>	<span class="k">def</span> <span class="nf">left_rotate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">node</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		.. _left_rotate:</span>
+<span class="sd">		</span>
+<span class="sd">		Left-rotate the subtree rooted at the given node.</span>
+
+<span class="sd">		:param node: the root the subtree to be rotated.</span>
+<span class="sd">		:type node: rbNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">y</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span>
+		<span class="n">node</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">left</span>
+		<span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">left</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="n">y</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">node</span>
+		<span class="n">y</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span>
+		<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">y</span>
+		<span class="k">elif</span> <span class="n">node</span> <span class="ow">is</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span><span class="p">:</span>
+			<span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">y</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">y</span>
+		<span class="n">y</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">node</span>
+		<span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">y</span>
+
+	</div>
+<div class="viewcode-block" id="RedBlackTree.right_rotate"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree.right_rotate">[docs]</a>	<span class="k">def</span> <span class="nf">right_rotate</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">node</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		.. _right_rotate:</span>
+<span class="sd">		</span>
+<span class="sd">		Right-rotate the subtree rooted at the given node.</span>
+
+<span class="sd">		:param node: the root the subtree to be rotated.</span>
+<span class="sd">		:type node: rbNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span>
+		<span class="n">node</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">right</span>
+		<span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">right</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="n">x</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">node</span>
+		<span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span>
+		<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">x</span>
+		<span class="k">elif</span> <span class="n">node</span> <span class="ow">is</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span><span class="p">:</span>
+			<span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">x</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">x</span>
+		<span class="n">x</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">node</span>
+		<span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">x</span>
+
+
+</div>
+<div class="viewcode-block" id="RedBlackTree.rb_insert"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree.rb_insert">[docs]</a>	<span class="k">def</span> <span class="nf">rb_insert</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">k</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Insert a key in the tree.</span>
+<span class="sd">		</span>
+<span class="sd">		Create a new node from the given key, and insert it into the tree.</span>
+
+<span class="sd">		:param k: a key.</span>
+<span class="sd">		:type k: int</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+
+		<span class="n">z</span> <span class="o">=</span> <span class="n">rbNode</span><span class="p">(</span> <span class="n">k</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nil</span> <span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">rb_insert_node</span><span class="p">(</span> <span class="n">z</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="RedBlackTree.rb_insert_node"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree.rb_insert_node">[docs]</a>	<span class="k">def</span> <span class="nf">rb_insert_node</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">fix_attribute_func</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Insert a node into the tree.</span>
+
+<span class="sd">		This procedure contains one variation with respect to CLRS3, 13.3: a reference can be passed to a function to be called on the node just inserted.</span>
+
+<span class="sd">		:param z: the node to be inserted.</span>
+<span class="sd">		:type z: rbNode</span>
+<span class="sd">		:param fix_attribute_func: a function that is to be called on the inserted node, typically used in augmented trees to update an attribute on the ancestors</span>
+<span class="sd">		:type fix_attribute_func: function</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+
+		<span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+
+		<span class="k">while</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="c">#print(&quot;Iteration&quot;)</span>
+			<span class="c">#print(&quot;x.key={} z.key={}&quot;.format(x.key, z.key))</span>
+			<span class="n">y</span> <span class="o">=</span> <span class="n">x</span>
+			<span class="k">if</span> <span class="n">z</span><span class="o">.</span><span class="n">key</span> <span class="o">&lt;</span> <span class="n">x</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
+				<span class="c">#print(&quot;x={}&quot;.format( x.left ))</span>
+				<span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">left</span>
+			<span class="k">else</span><span class="p">:</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">right</span>
+		<span class="n">z</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">y</span>
+
+		<span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">z</span>
+		<span class="k">elif</span> <span class="n">z</span><span class="o">.</span><span class="n">key</span> <span class="o">&lt;</span> <span class="n">y</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
+			<span class="n">y</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">z</span>
+		<span class="k">else</span><span class="p">:</span> 
+			<span class="n">y</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">z</span>
+		<span class="n">z</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span>
+		<span class="n">z</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span>
+		<span class="n">z</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span>
+
+		<span class="k">if</span> <span class="n">fix_attribute_func</span><span class="p">:</span>
+			<span class="n">fix_attribute_func</span><span class="p">(</span> <span class="n">z</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rb_insert_fixup</span><span class="p">(</span> <span class="n">z</span> <span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="RedBlackTree.rb_insert_fixup"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree.rb_insert_fixup">[docs]</a>	<span class="k">def</span> <span class="nf">rb_insert_fixup</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; After inserting a node, restore the Red-Black properties on its ancestors.</span>
+
+<span class="sd">		:param z: the node just inserted</span>
+<span class="sd">		:type z: rbNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">while</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span><span class="p">:</span>
+				<span class="n">y</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span>
+				<span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span><span class="p">:</span>
+					<span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="n">y</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span>
+					<span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="k">if</span> <span class="n">z</span> <span class="ow">is</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span><span class="p">:</span>
+						<span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span>
+						<span class="bp">self</span><span class="o">.</span><span class="n">left_rotate</span><span class="p">(</span> <span class="n">z</span> <span class="p">)</span>
+					<span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">right_rotate</span><span class="p">(</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="p">)</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">y</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span>
+				<span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span><span class="p">:</span>
+					<span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="n">y</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span>
+					<span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="k">if</span> <span class="n">z</span> <span class="ow">is</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span><span class="p">:</span>
+						<span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span>
+						<span class="bp">self</span><span class="o">.</span><span class="n">right_rotate</span><span class="p">(</span> <span class="n">z</span> <span class="p">)</span>
+					<span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">left_rotate</span><span class="p">(</span> <span class="n">z</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">color</span><span class="o">=</span><span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+
+
+</div>
+	<span class="k">def</span> <span class="nf">rb_transplant</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">u</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">v</span>
+		<span class="k">elif</span> <span class="n">u</span> <span class="ow">is</span> <span class="n">u</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span><span class="p">:</span>
+			<span class="n">u</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">v</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">u</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">v</span>
+		<span class="n">v</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">parent</span>
+
+
+
+<div class="viewcode-block" id="RedBlackTree.rb_delete"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree.rb_delete">[docs]</a>	<span class="k">def</span> <span class="nf">rb_delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">fix_attribute_func</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Delete a node from the tree.</span>
+
+<span class="sd">		This procedure contains one variation with respect to CLRS3, 13.4: a reference can be passed to a function to be called on the lowest node affected by the change (:math:`x`).</span>
+
+<span class="sd">		:param z: the node to be deleted.</span>
+<span class="sd">		:type z: rbNode</span>
+<span class="sd">		:param fix_attribute_func: a function that is to be called on the lowest node affected by the change, typically used in augmented trees to update an attribute on the ancestors</span>
+<span class="sd">		:type fix_attribute_func: function</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">y</span> <span class="o">=</span> <span class="n">z</span>
+		<span class="n">y_original_color</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">color</span>
+		<span class="k">if</span> <span class="n">z</span><span class="o">.</span><span class="n">left</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="n">x</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">right</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">rb_transplant</span><span class="p">(</span> <span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">right</span> <span class="p">)</span>
+		<span class="k">elif</span> <span class="n">z</span><span class="o">.</span><span class="n">right</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="n">x</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">left</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">rb_transplant</span><span class="p">(</span> <span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">left</span> <span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tree_minimum</span><span class="p">(</span> <span class="n">z</span><span class="o">.</span><span class="n">right</span> <span class="p">)</span>
+			<span class="n">y_original_color</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">color</span>
+			<span class="n">x</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">right</span>
+			<span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="n">z</span><span class="p">:</span>
+				<span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">y</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">rb_transplant</span><span class="p">(</span> <span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">right</span> <span class="p">)</span>
+				<span class="n">y</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">right</span>
+				<span class="n">y</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">y</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">rb_transplant</span><span class="p">(</span> <span class="n">z</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+			<span class="n">y</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">left</span>
+			<span class="n">y</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">y</span>
+			<span class="n">y</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">color</span>
+		<span class="c">#print(&#39;{}&#39;.format(x))</span>
+		<span class="k">if</span> <span class="n">fix_attribute_func</span><span class="p">:</span>
+			<span class="n">fix_attribute_func</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span>
+		<span class="k">if</span> <span class="n">y_original_color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">rb_delete_fixup</span><span class="p">(</span> <span class="n">x</span> <span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="RedBlackTree.rb_delete_fixup"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree.rb_delete_fixup">[docs]</a>	<span class="k">def</span> <span class="nf">rb_delete_fixup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; After deleting a node, restore the Red-Black properties on the subtree affected by the change.</span>
+
+<span class="sd">		:param z: the node whose ancestors should be fixed.</span>
+<span class="sd">		:type z: rbNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">while</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span><span class="p">:</span>
+				<span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span>
+				<span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span><span class="p">:</span>
+					<span class="n">w</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">left_rotate</span><span class="p">(</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="p">)</span>
+					<span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span>
+				<span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span> <span class="ow">and</span> <span class="n">w</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span><span class="p">:</span>
+					<span class="n">w</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span>
+					<span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span><span class="p">:</span>
+						<span class="n">w</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+						<span class="n">w</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span>
+						<span class="bp">self</span><span class="o">.</span><span class="n">right_rotate</span><span class="p">(</span> <span class="n">w</span> <span class="p">)</span>
+						<span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span>
+					<span class="n">w</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span>
+					<span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="n">w</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">left_rotate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+					<span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span>
+				<span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span><span class="p">:</span>
+					<span class="n">w</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">right_rotate</span><span class="p">(</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="p">)</span>
+					<span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span>
+				<span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span> <span class="ow">and</span> <span class="n">w</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span><span class="p">:</span>
+					<span class="n">w</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span>
+					<span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">color</span> <span class="o">==</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span><span class="p">:</span>
+						<span class="n">w</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+						<span class="n">w</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">RED</span>
+						<span class="bp">self</span><span class="o">.</span><span class="n">left_rotate</span><span class="p">(</span> <span class="n">w</span> <span class="p">)</span>
+						<span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span>
+					<span class="n">w</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span>
+					<span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="n">w</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">right_rotate</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+					<span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+				
+		<span class="n">x</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="o">.</span><span class="n">BLACK</span>
+</div>
+<div class="viewcode-block" id="RedBlackTree.tree_minimum"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree.tree_minimum">[docs]</a>	<span class="k">def</span> <span class="nf">tree_minimum</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">node</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; In the subtree rooted at the given node, Retrieve the node with the minimum key </span>
+
+<span class="sd">		:param node: root of the subtree to be searched.</span>
+<span class="sd">		:type node: rbNode</span>
+<span class="sd">		:return: the node with the minimum key, i.e. the leftmost node in the subtree</span>
+<span class="sd">		:rtype: rbNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="k">while</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+				<span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span>
+		<span class="k">return</span> <span class="n">node</span>
+</div>
+<div class="viewcode-block" id="RedBlackTree.to_array"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree.to_array">[docs]</a>	<span class="k">def</span> <span class="nf">to_array</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Return a nested list representation of the tree.</span>
+
+<span class="sd">		:return: a nested list representation of the tree, that does not include the NIL node.</span>
+<span class="sd">		:rtype: list</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">def</span> <span class="nf">to_array_rec</span><span class="p">(</span> <span class="n">node</span> <span class="p">):</span>
+			<span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+				<span class="k">return</span> <span class="bp">None</span>
+			<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span> <span class="ow">and</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">key</span>
+			<span class="k">return</span> <span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">to_array_rec</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span> <span class="p">),</span> <span class="n">to_array_rec</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span> <span class="p">))</span>
+		<span class="k">return</span> <span class="n">to_array_rec</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="RedBlackTree.inorder_walk"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree.inorder_walk">[docs]</a>	<span class="k">def</span> <span class="nf">inorder_walk</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		.. _inorder_walk:</span>
+<span class="sd">		</span>
+<span class="sd">		Perform a inorder tree walk, listing nodes, or node attributes along the way.</span>
+
+<span class="sd">		:param func: an optional reference to a procedure that extracts information for the visited nodes</span>
+<span class="sd">		:type func: function</span>
+<span class="sd">		:return: a list of nodes by default (or other information returned by the function passed as an optional parameter</span>
+<span class="sd">		:rtype: list</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">def</span> <span class="nf">inorder_rec</span><span class="p">(</span> <span class="n">node</span><span class="p">,</span> <span class="n">lst</span> <span class="p">):</span>
+			<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+				<span class="n">inorder_rec</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">lst</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">func</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+				<span class="n">lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">node</span> <span class="p">)</span>
+			<span class="k">else</span><span class="p">:</span>	
+				<span class="n">lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">func</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+			<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+				<span class="n">inorder_rec</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">lst</span><span class="p">)</span>
+			<span class="k">return</span> <span class="n">lst</span>	
+
+		<span class="k">return</span> <span class="n">inorder_rec</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="p">[])</span>
+</div>
+<div class="viewcode-block" id="RedBlackTree.to_binary_tree"><a class="viewcode-back" href="../index.html#red_black_tree.RedBlackTree.to_binary_tree">[docs]</a>	<span class="k">def</span> <span class="nf">to_binary_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Return a plain binary tree, with no sentinel nodes.</span>
+
+<span class="sd">		:return: a binary tree</span>
+<span class="sd">		:rtype: bt.BinaryTree</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="n">bt</span><span class="o">.</span><span class="n">BinaryTree</span><span class="p">(</span> <span class="n">array</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">to_array</span><span class="p">()</span> <span class="p">)</span>
+
+			
+
+</div></div>
+<span class="k">class</span> <span class="nc">RedBlackTreeUniTest</span><span class="p">(</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span> <span class="p">):</span>
+
+
+	<span class="k">def</span> <span class="nf">test_create_rbTree_1</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="n">bst</span> <span class="o">=</span> <span class="n">RedBlackTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">41</span><span class="p">,</span><span class="mi">38</span><span class="p">,</span><span class="mi">31</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">19</span><span class="p">,</span><span class="mi">8</span><span class="p">):</span>
+			<span class="n">bst</span><span class="o">.</span><span class="n">rb_insert</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+		<span class="c">#bst.to_binary_tree().display()	</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">to_array</span><span class="p">(),</span> <span class="p">(</span><span class="mi">38</span><span class="p">,(</span><span class="mi">19</span><span class="p">,</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="bp">None</span><span class="p">),</span><span class="mi">31</span><span class="p">),</span><span class="mi">41</span><span class="p">))</span>
+	
+	<span class="k">def</span> <span class="nf">test_create_rbTree_2</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="n">bst</span> <span class="o">=</span> <span class="n">RedBlackTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span><span class="mi">19</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span><span class="mi">23</span><span class="p">,</span><span class="mi">26</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">35</span><span class="p">,</span><span class="mi">38</span><span class="p">,</span><span class="mi">39</span><span class="p">,</span><span class="mi">41</span><span class="p">,</span><span class="mi">47</span><span class="p">):</span>
+			<span class="n">bst</span><span class="o">.</span><span class="n">rb_insert</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">to_array</span><span class="p">(),</span> <span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">)),</span> <span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="mi">21</span><span class="p">),</span> <span class="p">(</span><span class="mi">35</span><span class="p">,</span> <span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span> <span class="p">(</span><span class="mi">39</span><span class="p">,</span> <span class="mi">38</span><span class="p">,</span> <span class="p">(</span><span class="mi">41</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mi">47</span><span class="p">))))))</span>
+	
+	
+
+	<span class="k">def</span> <span class="nf">test_create_rbTree_3</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="n">bst</span> <span class="o">=</span> <span class="n">RedBlackTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">):</span>
+			<span class="n">bst</span><span class="o">.</span><span class="n">rb_insert</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+		<span class="n">bst</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>	
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">to_array</span><span class="p">(),</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="bp">None</span><span class="p">)),</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mi">15</span><span class="p">))))</span>
+	
+
+	<span class="k">def</span> <span class="nf">test_delete</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="n">bst</span> <span class="o">=</span> <span class="n">RedBlackTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">):</span>
+			<span class="n">bst</span><span class="o">.</span><span class="n">rb_insert</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+		<span class="n">bst</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>	
+
+		<span class="n">bst</span><span class="o">.</span><span class="n">rb_delete</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">left</span> <span class="p">)</span>
+		<span class="n">bst</span><span class="o">.</span><span class="n">rb_delete</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">left</span> <span class="p">)</span>
+		<span class="n">bst</span><span class="o">.</span><span class="n">rb_delete</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">left</span> <span class="p">)</span>
+		<span class="n">bst</span><span class="o">.</span><span class="n">rb_delete</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">left</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">to_array</span><span class="p">(),</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mi">15</span><span class="p">)))</span>
+	
+		<span class="n">bst</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>	
+
+	<span class="k">def</span> <span class="nf">test_tree_minimum_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		
+		<span class="n">bst</span> <span class="o">=</span> <span class="n">RedBlackTree</span><span class="p">()</span>
+		<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">):</span>
+			<span class="n">bst</span><span class="o">.</span><span class="n">rb_insert</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span>
+		<span class="n">bst</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>	
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">tree_minimum</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">root</span> <span class="p">)</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">test_tree_minimum_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		
+		<span class="n">bst</span> <span class="o">=</span> <span class="n">RedBlackTree</span><span class="p">()</span>
+		<span class="n">bst</span><span class="o">.</span><span class="n">rb_insert</span><span class="p">(</span> <span class="mi">11</span> <span class="p">)</span>
+		<span class="n">bst</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>	
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">tree_minimum</span><span class="p">(</span> <span class="n">bst</span><span class="o">.</span><span class="n">root</span> <span class="p">)</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+        <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+        <span class="n">main</span><span class="p">()</span>
+
+
+	
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Red-Black Trees 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, NPR.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

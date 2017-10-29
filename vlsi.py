@@ -4,19 +4,30 @@ import interval_tree as it
 import red_black_tree as rb
 import unittest
 
+INFTY = 2**14
 
+class YNode( it.IntervalNode ):
+	""" 
+	Store a rectangle's Y-interval, with the L y-coordinate as a key.
 
-class RectYNode( it.IntervalNode ):
+	:ivar rect: the rectangle, i.e. 4 coordinates
+	"""
 	
 	def __init__( self, rect ):
 
-		x1, y1, x2, y2 = rect
+		y1, y2 = rect[1], rect[3]
 		super().__init__( it.Interval( y1, y2))
-		self.max_x = x2
 
 		self.rect = rect
 
-class RectXNode( rb.rbNode ):
+class XNode( rb.rbNode ):
+	"""
+	Store a rectangle's X coordinate.
+
+	:ivar start: set to True if this is a L x-coordinate; False otherwise
+	:ivar rect: the rectangle, i.e. a 4-tuple of coordinates
+	:ivar interval: the corresponding Y-interval
+	"""
 	
 	def __init__( self, rect, high_x = False ):
 		"""
@@ -24,104 +35,102 @@ class RectXNode( rb.rbNode ):
 
 		:param rect: the rectangle coordinates (x1, y1, x2, y2)
 		:type rect: tuple
-		:param high_x: if True, use R-x coordinate as a key; use L-x coordinate otherwise
+		:param high_x: if True, use R x-coordinate as a key; use L-x coordinate otherwise
 		:type high_x: bool
 		"""
 		x1, y1, x2, y2 = rect
-
-		key = rect[2] if high_x else rect[0]
-
+			
+		key = x2 if high_x else x1
 		super().__init__( key )
+
+		self.start = False if high_x else True
+
 		self.interval = it.Interval(y1, y2)
 		self.rect = rect
+
+	def __str__( self ):
+		return '{}:{}'.format(self.key, '[' if self.start else ']')
 		
+	@staticmethod
+	def sentinel():
+		""" 
+		Create a sentinel node.
+
+		:return: a sentinel node, from a rectangle of infinite size
+		:rtype: XNode
+		"""
+		return XNode( (INFTY, INFTY, INFTY, INFTY ))
 
 
-def rec_overlap( rect1, rect2 ):
-	""" Test whether 2 rectangles overlap """
-	rect_1_x_interval = it.Interval( rect1[0], rect1[2])
-	rect_1_y_interval = it.Interval( rect1[1], rect1[3])
-	rect_2_x_interval = it.Interval( rect2[0], rect2[2])
-	rect_2_y_interval = it.Interval( rect2[1], rect2[3])
-
-	if rect_1_x_interval.overlap( rect_2_x_interval ) and  rect_1_y_interval.overlap( rect_2_y_interval ):
-		return True
-	return False
-
-
-def has_overlap_naive( rect_set ):
-	""" This procedure has O(n^2) cost in the worst case, when all x-intervals share the same R-boundary."""
-
-	y_tree = it.IntervalTree()
-
-	# swipe the rectangle set by order of L-x coordinate
-	for rect in rect_set: 
-		# check the y-interval tree for all intervals whose R-x coordinate is lower than rect's
-		# (assuming that this coordinate is stored on the node)
-		for node in y_tree.match_intervals( lambda z: z.max_x < rect[0] ):
-			print("Remove rectangle {}".format( node.rect ))
-			# and remove them from the y-interval tree
-			y_tree.delete_node( node )
-
-		# if rect overlaps with an existing interval in the y-interval tree, return True
-		rect_node = RectYNode( rect )
-		found = y_tree.search_overlap( rect_node.interval )
-		if found is not y_tree.nil:
-			return True
-		# otherwise insert the rectangle in the y-interval tree
-		else:
-			y_tree.insert_node( rect_node )
-			print("Insert rectangle {}".format( rect ))
-	return False
-
-def has_overlap( rect_set ):
-	""" A more sophisticated procedure:
-		* ensure that the rectangles are sorted by order of increasing L-x coordinate at the start
-		* use a second BST to keep track of the rectangles that can be deleted before an insertion 
+def build_endpoints_schedule( rectangles ):
 	"""
+	Build a sorted list of L and R x-coordinates for all rectangles. 
 
+	:param rectangles: a list of 4-tuples of coordinates
+	:type rectangles: list
+	:return: a list of XNode objects
+	:rtype: list
+	"""
+	low_x_tree = rb.RedBlackTree()
+	for rect in rectangles:
+		low_x_tree.rb_insert_node( XNode( rect ))
+	left_endpoints = low_x_tree.inorder_walk() + [ XNode.sentinel() ] 
+
+	#print([ '{}'.format(pt) for pt in left_endpoints], "Size: ", len(left_endpoints))
+
+
+	high_x_tree = rb.RedBlackTree()
+	for rect in rectangles:
+		high_x_tree.rb_insert_node( XNode( rect, high_x=True ))
+	right_endpoints = high_x_tree.inorder_walk() + [ XNode.sentinel() ]
+
+	#print([ '{}'.format(pt) for pt in right_endpoints], len(right_endpoints))
+	
+	# Merge the two sets of points
+	pos_l, pos_r = 0, 0
+
+	schedule = [None] * (len(rectangles)*2)
+	for i in range(0, len(schedule)):
+		# L endpoints comes first
+		if left_endpoints[ pos_l ].key <= right_endpoints[ pos_r ].key:
+			schedule[i] = left_endpoints[ pos_l ]
+			pos_l += 1
+		else:
+			schedule[i] = right_endpoints[ pos_r ]
+			pos_r += 1
+		#print('{}'.format([ ('{}'.format(pt) if not None else '') for pt in schedule ]))
+
+	return schedule
+			
+		
+def has_overlap( rectangles ):
+	""" 
+	Test whether a set of rectangles contain at least 2 overlapping elements.
+
+	:param rectangles: a list of 4-tuples of coordinates
+	:type rectangles: list
+	:return: True if the set contains at least 2 overlapping elements; False otherwise
+	:rtype: bool
+	"""
+	schedule = build_endpoints_schedule( rectangles )
 
 	# Store the Y-intervals
 	y_tree = it.IntervalTree()
 
-	# Store the Y-intervals, but uses the R-x coordinate as a key
-	x_tree = rb.RedBlackTree()
-
-
-	# Sort the rectangles, using the L-x coordinate as a key, using a BST
-	sorted_rects = rb.RedBlackTree()
-	for rect in rect_set:
-		sorted_rects.rb_insert_node( RectXNode( rect ))
-		
-	# swipe the rectangle set by order of L-x coordinate
-	for intrvl_node in sorted_rects.inorder_walk():
-		rect = intrvl_node.rect
-		# check the x-interval tree for all intervals whose R-x coordinate is lower than rect's
-		# and remove them from the x-interval tree
-		minimum = x_tree.tree_minimum( x_tree.root )
-		while minimum is not x_tree.nil and minimum.key  < rect[0]:
-			#print("Minimum: {}".format(minimum.key))
-			#print("Delete {} from x-tree".format( minimum.rect ))
-			x_tree.rb_delete( minimum )
-			y_tree.delete_interval( minimum.interval )
-			minimum = x_tree.tree_minimum(x_tree.root)
-
-		# if rect overlaps with an existing interval in the y-interval tree, return True
-		rect_y_node = RectYNode( rect )
-		found = y_tree.search_overlap( rect_y_node.interval )
-		if found is not y_tree.nil:
-			return True
-		# otherwise insert the rectangle in both trees
+	for pt in schedule:
+		if pt.start:
+			found = y_tree.search_overlap( pt.interval )
+			if found is not y_tree.nil:
+				return True
+			y_tree.insert_node( YNode( pt.rect ))
 		else:
-			y_tree.insert_node( rect_y_node )
-			#print("Insert rectangle {} in Y-tree".format( rect ))
-			x_tree.rb_insert_node( RectXNode( rect, high_x=True ) )
-			#print("Insert rectangle {} in X-tree".format( rect ))
-		x_tree.to_bst().display()
+			y_tree.delete_interval( pt.interval )
+	
 	return False
 
-class VLSI_UniTest( unittest.TestCase ):
+		
 
+class VLSI_UniTest( unittest.TestCase ):
 
 	def setUp( self ):
 
@@ -146,7 +155,7 @@ class VLSI_UniTest( unittest.TestCase ):
 			]
 
 	def test_non_overlapping( self ):
-		print("Test 0")
+		print("Non overlapping rectangles")
 		
 		self.assertFalse( has_overlap( self.rectangles ) )
 

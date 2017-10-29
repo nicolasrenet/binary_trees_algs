@@ -271,17 +271,24 @@ class RedBlackTree( bt.BinaryTree ):
 				
 		x.color = Color.BLACK
 
-		
-	
-
 	def tree_minimum( self, node ):
+		""" In the subtree rooted at the given node, Retrieve the node with the minimum key 
+
+		:param node: root of the subtree to be searched.
+		:type node: rbNode
+		:return: the node with the minimum key, i.e. the leftmost node in the subtree
+		:rtype: rbNode
+		"""
 		if node is not self.nil:
 			while node.left is not self.nil:
 				node = node.left
 		return node
 
 	def to_array( self ):
-		""" Return a nested list representation of the tree, that does not include the NIL node.
+		""" Return a nested list representation of the tree.
+
+		:return: a nested list representation of the tree, that does not include the NIL node.
+		:rtype: list
 		"""
 		def to_array_rec( node ):
 			if node is self.nil:
@@ -296,9 +303,11 @@ class RedBlackTree( bt.BinaryTree ):
 		"""
 		.. _inorder_walk:
 		
-		Perform a inorder tree walk, listing low, high and max attributes for each node.
+		Perform a inorder tree walk, listing nodes, or node attributes along the way.
 
-		:return: a list of triplets 'low:high:max'
+		:param func: an optional reference to a procedure that extracts information for the visited nodes
+		:type func: function
+		:return: a list of nodes by default (or other information returned by the function passed as an optional parameter
 		:rtype: list
 		"""
 		def inorder_rec( node, lst ):
@@ -314,9 +323,11 @@ class RedBlackTree( bt.BinaryTree ):
 
 		return inorder_rec( self.root, [])
 
+	def to_binary_tree(self):
+		""" Return a plain binary tree, with no sentinel nodes.
 
-	def to_bst(self):
-		""" Return a standard Binary Search Tree, with no sentinel nodes.
+		:return: a binary tree
+		:rtype: bt.BinaryTree
 		"""
 		return bt.BinaryTree( array=self.to_array() )
 
@@ -331,7 +342,7 @@ class RedBlackTreeUniTest( unittest.TestCase ):
 
 		for key in (41,38,31,12,19,8):
 			bst.rb_insert( key )
-		#bst.to_bst().display()	
+		#bst.to_binary_tree().display()	
 
 		self.assertEqual( bst.to_array(), (38,(19, (12,8,None),31),41))
 	
@@ -349,7 +360,7 @@ class RedBlackTreeUniTest( unittest.TestCase ):
 
 		for key in (11,2,14,15,1,7,5,8,4):
 			bst.rb_insert( key )
-		bst.to_bst().display()	
+		bst.to_binary_tree().display()	
 		self.assertEqual( bst.to_array(), (7, (2, 1, (5, 4, None)), (11, 8, (14, None, 15))))
 	
 
@@ -358,7 +369,7 @@ class RedBlackTreeUniTest( unittest.TestCase ):
 
 		for key in (11,2,14,15,1,7,5,8,4):
 			bst.rb_insert( key )
-		bst.to_bst().display()	
+		bst.to_binary_tree().display()	
 
 		bst.rb_delete( bst.root.left )
 		bst.rb_delete( bst.root.left )
@@ -366,14 +377,14 @@ class RedBlackTreeUniTest( unittest.TestCase ):
 		bst.rb_delete( bst.root.left )
 		self.assertEqual( bst.to_array(), (11, (7, None, 8), (14, None, 15)))
 	
-		bst.to_bst().display()	
+		bst.to_binary_tree().display()	
 
 	def test_tree_minimum_1(self):
 		
 		bst = RedBlackTree()
 		for key in (11,2,14,15,1,7,5,8,4):
 			bst.rb_insert( key )
-		bst.to_bst().display()	
+		bst.to_binary_tree().display()	
 
 		self.assertEqual( bst.tree_minimum( bst.root ).key, 1)
 
@@ -381,7 +392,7 @@ class RedBlackTreeUniTest( unittest.TestCase ):
 		
 		bst = RedBlackTree()
 		bst.rb_insert( 11 )
-		bst.to_bst().display()	
+		bst.to_binary_tree().display()	
 
 		self.assertEqual( bst.tree_minimum( bst.root ).key, 11)
 

@@ -8,15 +8,15 @@ class IntervalNode(rbt.rbNode):
 	"""
 	A tree node, that stores an interval.
 
-	:ivar: interval
-	:max: the maximum right boundary for all intervals in the subtree
+	:ivar interval: interval
+	:ivar max: the maximum right boundary for all intervals in the subtree
 	"""
 	
 	def __init__( self, interval=None):
 		"""
 		Create a new interval node.
 
-		:param interval: an interval
+		:param interval: an interval; if None, create a NIL node, with -INFTY max attribute.
 		:type interval: Interval
 		"""
 
@@ -41,7 +41,14 @@ class Interval():
 
 	
 	def __init__(self, low, high ):
-		
+		"""
+		Create a new interval.
+
+		:param low: the left boundary.
+		:param high: the right boundary.
+		:type low: float
+		:type high: float
+		"""
 		self.low=low
 		self.high=high
 	
@@ -75,6 +82,10 @@ class Interval():
 class IntervalTree( rbt.RedBlackTree ):
 
 	def __init__(self):
+		""" 
+		Create a new Interval Tree.
+
+		"""
 		super().__init__()
 		self.nil = IntervalNode()
 		self.root = self.nil
@@ -229,6 +240,12 @@ class IntervalTree( rbt.RedBlackTree ):
 
 
 	def list(self):
+		""" 
+		Provide a string representation of all nodes in the tree.
+
+		:return: a lists of triplets of the form 'key:interval.high:max'
+		:rtype: str
+		"""
 		return self.inorder_walk( lambda x: '{}:{}:{}'.format(x.key, x.interval.high, x.max))
 	
 	def match_intervals(self, match_func=None) :
@@ -299,8 +316,8 @@ class IntervalTree_UnitTest( unittest.TestCase ):
 			#print("{}: {} : {}".format(type(int_node), int_node.key, int_node.max) )
 			it.insert_interval( i )
 			#print(it.list())
-			#it.to_bst().display()
-		it.to_bst().display()
+			#it.to_binary_tree().display()
+		it.to_binary_tree().display()
 		print( it.list())
 
 
@@ -312,8 +329,8 @@ class IntervalTree_UnitTest( unittest.TestCase ):
 			#print("{}: {} : {}".format(type(int_node), int_node.key, int_node.max) )
 			it.insert_interval( i )
 			#print(it.list())
-			#it.to_bst().display()
-		it.to_bst().display()
+			#it.to_binary_tree().display()
+		it.to_binary_tree().display()
 		print(it.list())
 
 
@@ -351,7 +368,7 @@ class IntervalTree_UnitTest( unittest.TestCase ):
 
 		for i in self.intervals:
 			it.insert_interval( i )
-		it.to_bst().display()
+		it.to_binary_tree().display()
 		found = it.search_interval( Interval(17,19))
 		print("Found: Interval({},{})".format(found.interval.low, found.interval.high))
 		self.assertTrue(  found.interval.equal( Interval(17,19)))
@@ -383,9 +400,9 @@ class IntervalTree_UnitTest( unittest.TestCase ):
 
 		for i in self.intervals:
 			it.insert_interval( i )
-		it.to_bst().display()
+		it.to_binary_tree().display()
 		it.delete_interval( Interval(17,19 ))
-		it.to_bst().display()
+		it.to_binary_tree().display()
 		print(it.list())
 		self.assertEqual( it.list(), ['0:3:3', '5:8:10', '6:10:10', '8:9:30', '15:23:23', '16:21:30', '19:20:20', '25:30:30', '26:26:26'])
 
@@ -395,9 +412,9 @@ class IntervalTree_UnitTest( unittest.TestCase ):
 
 		for i in self.intervals:
 			it.insert_interval( i )
-		it.to_bst().display()
+		it.to_binary_tree().display()
 		it.delete_interval( Interval(8,9 ))
-		it.to_bst().display()
+		it.to_binary_tree().display()
 		self.assertEqual( it.list(), ['0:3:3', '5:8:10', '6:10:10', '15:23:30', '16:21:21', '17:19:19', '19:20:30', '25:30:30', '26:26:26'])
 		print(it.list())
 
@@ -408,7 +425,7 @@ class IntervalTree_UnitTest( unittest.TestCase ):
 
 		for i in self.intervals:
 			it.insert_interval( i )
-		it.to_bst().display()
+		it.to_binary_tree().display()
 
 		
 		self.assertEqual( len(it.match_intervals( lambda x: x.interval.high < 15 )), 4)

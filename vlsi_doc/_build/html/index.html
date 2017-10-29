@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to VLSI’s documentation! &mdash; VLSI 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="VLSI 1.0 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">VLSI 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-vlsi-s-documentation">
+<h1>Welcome to VLSI&#8217;s documentation!<a class="headerlink" href="#welcome-to-vlsi-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+<span class="target" id="module-vlsi"></span><dl class="class">
+<dt id="vlsi.YNode">
+<em class="property">class </em><tt class="descclassname">vlsi.</tt><tt class="descname">YNode</tt><big>(</big><em>rect</em><big>)</big><a class="reference internal" href="_modules/vlsi.html#YNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vlsi.YNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a rectangle&#8217;s Y-interval, with the L y-coordinate as a key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><strong>rect</strong> &#8211; the rectangle, i.e. 4 coordinates</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="vlsi.XNode">
+<em class="property">class </em><tt class="descclassname">vlsi.</tt><tt class="descname">XNode</tt><big>(</big><em>rect</em>, <em>high_x=False</em><big>)</big><a class="reference internal" href="_modules/vlsi.html#XNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vlsi.XNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a rectangle&#8217;s X coordinate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>start</strong> &#8211; set to True if this is a L x-coordinate; False otherwise</li>
+<li><strong>rect</strong> &#8211; the rectangle, i.e. a 4-tuple of coordinates</li>
+<li><strong>interval</strong> &#8211; the corresponding Y-interval</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="vlsi.XNode.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>rect</em>, <em>high_x=False</em><big>)</big><a class="reference internal" href="_modules/vlsi.html#XNode.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vlsi.XNode.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a node for an x-coordinate.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>rect</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#tuple" title="(in Python v2.7)"><em>tuple</em></a>) &#8211; the rectangle coordinates (x1, y1, x2, y2)</li>
+<li><strong>high_x</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; if True, use R x-coordinate as a key; use L-x coordinate otherwise</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="vlsi.XNode.sentinel">
+<em class="property">static </em><tt class="descname">sentinel</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/vlsi.html#XNode.sentinel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vlsi.XNode.sentinel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a sentinel node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a sentinel node, from a rectangle of infinite size</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">XNode</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="vlsi.build_endpoints_schedule">
+<tt class="descclassname">vlsi.</tt><tt class="descname">build_endpoints_schedule</tt><big>(</big><em>rectangles</em><big>)</big><a class="reference internal" href="_modules/vlsi.html#build_endpoints_schedule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vlsi.build_endpoints_schedule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a sorted list of L and R x-coordinates for all rectangles.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rectangles</strong> (<em>list</em>) &#8211; a list of 4-tuples of coordinates</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a list of XNode objects</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="vlsi.has_overlap">
+<tt class="descclassname">vlsi.</tt><tt class="descname">has_overlap</tt><big>(</big><em>rectangles</em><big>)</big><a class="reference internal" href="_modules/vlsi.html#has_overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vlsi.has_overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test whether a set of rectangles contain at least 2 overlapping elements.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rectangles</strong> (<em>list</em>) &#8211; a list of 4-tuples of coordinates</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the set contains at least 2 overlapping elements; False otherwise</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to VLSI&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">VLSI 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, NPR.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

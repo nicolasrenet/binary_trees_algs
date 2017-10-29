@@ -1,0 +1,540 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>interval_tree &mdash; Interval Tree 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Interval Tree 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Interval Tree 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for interval_tree</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python3</span>
+
+<span class="kn">import</span> <span class="nn">red_black_tree</span> <span class="kn">as</span> <span class="nn">rbt</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+
+<div class="viewcode-block" id="IntervalNode"><a class="viewcode-back" href="../index.html#interval_tree.IntervalNode">[docs]</a><span class="k">class</span> <span class="nc">IntervalNode</span><span class="p">(</span><span class="n">rbt</span><span class="o">.</span><span class="n">rbNode</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	A tree node, that stores an interval.</span>
+
+<span class="sd">	:ivar interval: interval</span>
+<span class="sd">	:ivar max: the maximum right boundary for all intervals in the subtree</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	
+<div class="viewcode-block" id="IntervalNode.__init__"><a class="viewcode-back" href="../index.html#interval_tree.IntervalNode.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Create a new interval node.</span>
+
+<span class="sd">		:param interval: an interval; if None, create a NIL node, with -INFTY max attribute.</span>
+<span class="sd">		:type interval: Interval</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>
+
+		<span class="c"># For NIL nodes</span>
+		<span class="k">if</span> <span class="n">interval</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="s">&#39;n&#39;</span> <span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">16</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="c"># the key is interval.low</span>
+			<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="n">interval</span><span class="o">.</span><span class="n">low</span> <span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="n">interval</span><span class="o">.</span><span class="n">high</span>
+
+</div></div>
+<div class="viewcode-block" id="Interval"><a class="viewcode-back" href="../index.html#interval_tree.Interval">[docs]</a><span class="k">class</span> <span class="nc">Interval</span><span class="p">():</span>
+	<span class="sd">&quot;&quot;&quot; An interval representation </span>
+<span class="sd">	</span>
+<span class="sd">	:ivar low: lower boundary</span>
+<span class="sd">	:ivar high: upper boundary</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+
+	
+<div class="viewcode-block" id="Interval.__init__"><a class="viewcode-back" href="../index.html#interval_tree.Interval.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">low</span><span class="p">,</span> <span class="n">high</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Create a new interval.</span>
+
+<span class="sd">		:param low: the left boundary.</span>
+<span class="sd">		:param high: the right boundary.</span>
+<span class="sd">		:type low: float</span>
+<span class="sd">		:type high: float</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">low</span><span class="o">=</span><span class="n">low</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">high</span><span class="o">=</span><span class="n">high</span>
+	</div>
+<div class="viewcode-block" id="Interval.overlap"><a class="viewcode-back" href="../index.html#interval_tree.Interval.overlap">[docs]</a>	<span class="k">def</span> <span class="nf">overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">interval</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Check if this interval overlaps with the given interval.</span>
+
+<span class="sd">		:param interval: the interval we compare this interval to</span>
+<span class="sd">		:type interval: Interval</span>
+<span class="sd">		:return: True if the two intervals overlap; False otherwise</span>
+<span class="sd">		:rtype: bool</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="p">((</span><span class="n">interval</span><span class="o">.</span><span class="n">low</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">high</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">low</span> <span class="o">&lt;=</span> <span class="n">interval</span><span class="o">.</span><span class="n">high</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="Interval.equal"><a class="viewcode-back" href="../index.html#interval_tree.Interval.equal">[docs]</a>	<span class="k">def</span> <span class="nf">equal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Check if this interval and the given interval have the same boundaries.</span>
+
+<span class="sd">		:param interval: the interval we compare this interval to</span>
+<span class="sd">		:type interval: Interval</span>
+<span class="sd">		:return: True if the two intervals have the same boundaries; False otherwise</span>
+<span class="sd">		:rtype: bool</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">low</span> <span class="o">==</span> <span class="n">interval</span><span class="o">.</span><span class="n">low</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">high</span> <span class="o">==</span> <span class="n">interval</span><span class="o">.</span><span class="n">high</span><span class="p">))</span>
+	</div>
+	<span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span> <span class="s">&#39;[{}:{}]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">low</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">high</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="IntervalTree"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree">[docs]</a><span class="k">class</span> <span class="nc">IntervalTree</span><span class="p">(</span> <span class="n">rbt</span><span class="o">.</span><span class="n">RedBlackTree</span> <span class="p">):</span>
+
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Create a new Interval Tree.</span>
+
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">nil</span> <span class="o">=</span> <span class="n">IntervalNode</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span>
+	
+<div class="viewcode-block" id="IntervalTree.fix_max_up"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree.fix_max_up">[docs]</a>	<span class="k">def</span> <span class="nf">fix_max_up</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">node</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Given a node that has just been inserted into the tree, update the max value on the ancestors.</span>
+
+<span class="sd">		:param node: an interval node</span>
+<span class="sd">		:type node: IntervalNode </span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="c">#print(&quot;fix_max_up({})&quot;.format( node ))		</span>
+		<span class="k">while</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span> 
+			<span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">high</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+			<span class="n">node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span>
+</div>
+<div class="viewcode-block" id="IntervalTree.left_rotate"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree.left_rotate">[docs]</a>	<span class="k">def</span> <span class="nf">left_rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		.. _left_rotate:</span>
+<span class="sd">		</span>
+<span class="sd">		Left-rotate the subtree rooted at the given node. Update the max attribute when appropriate.</span>
+
+<span class="sd">		:param node: the root the subtree to be rotated.</span>
+<span class="sd">		:type node: IntervalNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">y</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span>
+		<span class="n">node</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">left</span>
+		<span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">left</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="n">y</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">node</span>
+		<span class="n">y</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span>
+		<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">y</span>
+		<span class="k">elif</span> <span class="n">node</span> <span class="ow">is</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span><span class="p">:</span>
+			<span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">y</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">y</span>
+		<span class="n">y</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">node</span>
+		<span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">y</span>
+		<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">max</span> <span class="o">&gt;</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">:</span>
+			<span class="n">y</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">max</span>
+		<span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">max</span> <span class="o">&gt;</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">max</span><span class="p">:</span>
+			<span class="n">node</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">high</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IntervalTree.right_rotate"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree.right_rotate">[docs]</a>	<span class="k">def</span> <span class="nf">right_rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		.. _right_rotate:</span>
+<span class="sd">		</span>
+<span class="sd">		Right-rotate the subtree rooted at the given node. Update the max attribute when appropriate.</span>
+
+<span class="sd">		:param node: the root the subtree to be rotated.</span>
+<span class="sd">		:type node: IntervalNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span>
+		<span class="n">node</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">right</span>
+		<span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">right</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="n">x</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">node</span>
+		<span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span>
+		<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">x</span>
+		<span class="k">elif</span> <span class="n">node</span> <span class="ow">is</span> <span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span><span class="p">:</span>
+			<span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">x</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">node</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">x</span>
+		<span class="n">x</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">node</span>
+		<span class="n">node</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">x</span>
+		<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">max</span> <span class="o">&gt;</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">:</span>
+			<span class="n">x</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">max</span>
+		<span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">max</span> <span class="o">&gt;</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">max</span><span class="p">:</span>
+			<span class="n">node</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">high</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">max</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="IntervalTree.insert_interval"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree.insert_interval">[docs]</a>	<span class="k">def</span> <span class="nf">insert_interval</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">intrvl</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Insert a new interval into the tree.</span>
+
+<span class="sd">		:param intrvl: the interval to be inserted</span>
+<span class="sd">		:type intrvl: Interval</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">node</span> <span class="o">=</span> <span class="n">IntervalNode</span><span class="p">(</span> <span class="n">intrvl</span> <span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">insert_node</span><span class="p">(</span> <span class="n">node</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IntervalTree.insert_node"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree.insert_node">[docs]</a>	<span class="k">def</span> <span class="nf">insert_node</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Insert a new node into the tree.</span>
+
+<span class="sd">		:param node: the interval node to be inserted</span>
+<span class="sd">		:type node: IntervalNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rb_insert_node</span><span class="p">(</span> <span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fix_max_up</span> <span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IntervalTree.delete_interval"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree.delete_interval">[docs]</a>	<span class="k">def</span> <span class="nf">delete_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interval</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Delete an interval from the tree.</span>
+
+<span class="sd">		Search the first interval node with matching boundaries, and remove it from the tree.</span>
+
+<span class="sd">		:param intrvl: the interval to be deleted</span>
+<span class="sd">		:type intrvl: Interval</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">to_delete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">search_interval</span><span class="p">(</span> <span class="n">interval</span> <span class="p">)</span>
+		<span class="k">if</span> <span class="n">to_delete</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">delete_node</span><span class="p">(</span> <span class="n">to_delete</span> <span class="p">)</span>
+	
+	</div>
+<div class="viewcode-block" id="IntervalTree.delete_node"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree.delete_node">[docs]</a>	<span class="k">def</span> <span class="nf">delete_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Delete an interval node from the tree.</span>
+
+<span class="sd">		Search the given interval node, and remove it from the tree.</span>
+
+<span class="sd">		:param z: the node to be deleted</span>
+<span class="sd">		:type z: IntervalNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">rb_delete</span><span class="p">(</span> <span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fix_max_up</span> <span class="p">)</span>
+	
+	</div>
+<div class="viewcode-block" id="IntervalTree.search_interval"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree.search_interval">[docs]</a>	<span class="k">def</span> <span class="nf">search_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Search for the given interval.</span>
+
+<span class="sd">		:param interval: an interval</span>
+<span class="sd">		:type interval: Interval</span>
+<span class="sd">		:return: the first interval node with the same boundaries, if it exists in the tree; the NIL node otherwise.</span>
+<span class="sd">		:rtype: IntervalNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+		<span class="k">while</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">interval</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span> <span class="n">x</span><span class="o">.</span><span class="n">interval</span> <span class="p">):</span>
+			<span class="c">#print(&quot;search({} against {})&quot;.format( interval, x.interval ))</span>
+			<span class="k">if</span> <span class="n">interval</span><span class="o">.</span><span class="n">low</span> <span class="o">&lt;</span> <span class="n">x</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
+				<span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">left</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">right</span>
+		<span class="k">return</span> <span class="n">x</span>
+</div>
+<div class="viewcode-block" id="IntervalTree.search_overlap"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree.search_overlap">[docs]</a>	<span class="k">def</span> <span class="nf">search_overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interval</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Search for an interval that overlaps with the given interval.</span>
+
+<span class="sd">		:param interval: an interval</span>
+<span class="sd">		:type interval: Interval</span>
+<span class="sd">		:return: the first interval node whose boundaries overlap with the given interval, if it exists in the tree; the NIL node otherwise.</span>
+<span class="sd">		:rtype: IntervalNode</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+		<span class="c">#print(&quot;search({})&quot;.format( interval ))</span>
+		<span class="k">while</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">interval</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span> <span class="n">x</span><span class="o">.</span><span class="n">interval</span> <span class="p">):</span>
+			<span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">left</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">max</span> <span class="o">&gt;=</span> <span class="n">interval</span><span class="o">.</span><span class="n">low</span><span class="p">:</span>
+				<span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">left</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">right</span>
+		<span class="k">return</span> <span class="n">x</span>
+
+</div>
+<div class="viewcode-block" id="IntervalTree.list"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree.list">[docs]</a>	<span class="k">def</span> <span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Provide a string representation of all nodes in the tree.</span>
+
+<span class="sd">		:return: a lists of triplets of the form &#39;key:interval.high:max&#39;</span>
+<span class="sd">		:rtype: str</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">inorder_walk</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s">&#39;{}:{}:{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">high</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
+	</div>
+<div class="viewcode-block" id="IntervalTree.match_intervals"><a class="viewcode-back" href="../index.html#interval_tree.IntervalTree.match_intervals">[docs]</a>	<span class="k">def</span> <span class="nf">match_intervals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">match_func</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span> <span class="p">:</span>
+		<span class="sd">&quot;&quot;&quot; Search all nodes that match a given criteria.</span>
+
+<span class="sd">		:match_func: a boolean function, to be run on each visited node: it it returns True, the node is added to the result set</span>
+<span class="sd">		:type match_func: function</span>
+<span class="sd">		:return: a set of nodes; None if the tree does not contain any matching node</span>
+<span class="sd">		:rtype: list</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">def</span> <span class="nf">match</span><span class="p">(</span> <span class="n">node</span><span class="p">,</span> <span class="n">lst</span><span class="p">):</span>
+			<span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">lst</span>
+			<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+				<span class="n">match</span><span class="p">(</span> <span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">lst</span> <span class="p">)</span>
+			<span class="k">if</span> <span class="n">match_func</span><span class="p">(</span> <span class="n">node</span> <span class="p">):</span>
+				<span class="n">lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">node</span> <span class="p">)</span>
+			<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">right</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nil</span><span class="p">:</span>
+				<span class="n">match</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">lst</span><span class="p">)</span>
+			<span class="k">return</span> <span class="n">lst</span>
+
+		<span class="k">return</span> <span class="n">match</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="p">[])</span>
+
+
+
+</div></div>
+<span class="k">class</span> <span class="nc">IntervalTree_UnitTest</span><span class="p">(</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span> <span class="p">):</span>
+
+
+	<span class="n">intervals</span> <span class="o">=</span> <span class="p">(</span>	<span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span> <span class="mi">15</span><span class="p">,</span><span class="mi">23</span><span class="p">),</span>
+			<span class="n">Interval</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">21</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span><span class="mi">19</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span><span class="mi">20</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span><span class="mi">30</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span> <span class="mi">26</span><span class="p">,</span><span class="mi">26</span><span class="p">))</span>
+	
+			
+	<span class="k">def</span> <span class="nf">test_interval_equal</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)))</span>
+
+
+	<span class="k">def</span> <span class="nf">test_interval_overlap_true</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">6</span><span class="p">)))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">)))</span>
+
+
+	<span class="k">def</span> <span class="nf">test_interval_overlap_false</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">overlap</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mf">5.5</span><span class="p">,</span><span class="mi">6</span><span class="p">)))</span>
+	
+	<span class="k">def</span> <span class="nf">test_create_IntervalTree_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Empty tree &quot;&quot;&quot;</span>
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">it</span><span class="o">.</span><span class="n">root</span> <span class="ow">is</span> <span class="n">it</span><span class="o">.</span><span class="n">nil</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">test_create_IntervalTree_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Single-node tree &quot;&quot;&quot;</span>
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+		<span class="n">it</span><span class="o">.</span><span class="n">insert_interval</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span> <span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">it</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="mi">5</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">test_create_IntervalTree_3</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">:</span>
+			<span class="c">#print(&quot;{}: {} : {}&quot;.format(type(int_node), int_node.key, int_node.max) )</span>
+			<span class="n">it</span><span class="o">.</span><span class="n">insert_interval</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span>
+			<span class="c">#print(it.list())</span>
+			<span class="c">#it.to_binary_tree().display()</span>
+		<span class="n">it</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+		<span class="k">print</span><span class="p">(</span> <span class="n">it</span><span class="o">.</span><span class="n">list</span><span class="p">())</span>
+
+
+	<span class="k">def</span> <span class="nf">test_create_IntervalTree_4</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">21</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span><span class="mi">30</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">8</span><span class="p">),</span>  <span class="n">Interval</span><span class="p">(</span> <span class="mi">15</span><span class="p">,</span><span class="mi">23</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span><span class="mi">19</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span> <span class="mi">26</span><span class="p">,</span><span class="mi">26</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">10</span><span class="p">),</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span><span class="mi">20</span><span class="p">)):</span>
+			<span class="c">#print(&quot;{}: {} : {}&quot;.format(type(int_node), int_node.key, int_node.max) )</span>
+			<span class="n">it</span><span class="o">.</span><span class="n">insert_interval</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span>
+			<span class="c">#print(it.list())</span>
+			<span class="c">#it.to_binary_tree().display()</span>
+		<span class="n">it</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+		<span class="k">print</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">list</span><span class="p">())</span>
+
+
+	<span class="k">def</span> <span class="nf">test_search_overlap_1</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Search overlapping interval: successful search &quot;&quot;&quot;</span>
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">:</span>
+			<span class="n">it</span><span class="o">.</span><span class="n">insert_interval</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span>
+		<span class="n">found</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">search_overlap</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span><span class="mi">25</span><span class="p">))</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Found: Interval({},{})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">found</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">low</span><span class="p">,</span> <span class="n">found</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">high</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span>  <span class="n">found</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">23</span><span class="p">)))</span>
+
+	<span class="k">def</span> <span class="nf">test_search_overlap_2</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Search overlapping interval: unsuccessful search &quot;&quot;&quot;</span>
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">:</span>
+			<span class="n">it</span><span class="o">.</span><span class="n">insert_interval</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span>
+		<span class="n">found</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">search_overlap</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">34</span><span class="p">,</span><span class="mi">40</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>  <span class="n">found</span><span class="p">,</span> <span class="n">it</span><span class="o">.</span><span class="n">nil</span> <span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">test_search_overlap_3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Search an empty tree &quot;&quot;&quot;</span>
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="n">found</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">search_overlap</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">found</span><span class="p">,</span> <span class="n">it</span><span class="o">.</span><span class="n">nil</span><span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">test_search_interval_1</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Search exact interval: successful search &quot;&quot;&quot;</span>
+		
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">:</span>
+			<span class="n">it</span><span class="o">.</span><span class="n">insert_interval</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span>
+		<span class="n">it</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+		<span class="n">found</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">search_interval</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span><span class="mi">19</span><span class="p">))</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Found: Interval({},{})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">found</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">low</span><span class="p">,</span> <span class="n">found</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">high</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span>  <span class="n">found</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span><span class="mi">19</span><span class="p">)))</span>
+
+
+	<span class="k">def</span> <span class="nf">test_search_interval_2</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Search exact interval: unsuccessful search &quot;&quot;&quot;</span>
+		
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">:</span>
+			<span class="n">it</span><span class="o">.</span><span class="n">insert_interval</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span>
+		<span class="n">found</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">search_interval</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span><span class="mi">20</span><span class="p">))</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;found: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span> <span class="n">found</span> <span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span>  <span class="n">found</span><span class="p">,</span> <span class="n">it</span><span class="o">.</span><span class="n">nil</span> <span class="p">)</span>
+
+
+	<span class="k">def</span> <span class="nf">test_search_interval_3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Search an empty tree &quot;&quot;&quot;</span>
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="n">found</span> <span class="o">=</span> <span class="n">it</span><span class="o">.</span><span class="n">search_interval</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">found</span><span class="p">,</span> <span class="n">it</span><span class="o">.</span><span class="n">nil</span><span class="p">)</span>
+
+	
+	<span class="k">def</span> <span class="nf">test_delete_interval_1</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Delete interval&quot;&quot;&quot;</span>
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">:</span>
+			<span class="n">it</span><span class="o">.</span><span class="n">insert_interval</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span>
+		<span class="n">it</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+		<span class="n">it</span><span class="o">.</span><span class="n">delete_interval</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">17</span><span class="p">,</span><span class="mi">19</span> <span class="p">))</span>
+		<span class="n">it</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+		<span class="k">print</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">list</span><span class="p">())</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">it</span><span class="o">.</span><span class="n">list</span><span class="p">(),</span> <span class="p">[</span><span class="s">&#39;0:3:3&#39;</span><span class="p">,</span> <span class="s">&#39;5:8:10&#39;</span><span class="p">,</span> <span class="s">&#39;6:10:10&#39;</span><span class="p">,</span> <span class="s">&#39;8:9:30&#39;</span><span class="p">,</span> <span class="s">&#39;15:23:23&#39;</span><span class="p">,</span> <span class="s">&#39;16:21:30&#39;</span><span class="p">,</span> <span class="s">&#39;19:20:20&#39;</span><span class="p">,</span> <span class="s">&#39;25:30:30&#39;</span><span class="p">,</span> <span class="s">&#39;26:26:26&#39;</span><span class="p">])</span>
+
+	<span class="k">def</span> <span class="nf">test_delete_interval_2</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Delete interval&quot;&quot;&quot;</span>
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">:</span>
+			<span class="n">it</span><span class="o">.</span><span class="n">insert_interval</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span>
+		<span class="n">it</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+		<span class="n">it</span><span class="o">.</span><span class="n">delete_interval</span><span class="p">(</span> <span class="n">Interval</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span> <span class="p">))</span>
+		<span class="n">it</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="n">it</span><span class="o">.</span><span class="n">list</span><span class="p">(),</span> <span class="p">[</span><span class="s">&#39;0:3:3&#39;</span><span class="p">,</span> <span class="s">&#39;5:8:10&#39;</span><span class="p">,</span> <span class="s">&#39;6:10:10&#39;</span><span class="p">,</span> <span class="s">&#39;15:23:30&#39;</span><span class="p">,</span> <span class="s">&#39;16:21:21&#39;</span><span class="p">,</span> <span class="s">&#39;17:19:19&#39;</span><span class="p">,</span> <span class="s">&#39;19:20:30&#39;</span><span class="p">,</span> <span class="s">&#39;25:30:30&#39;</span><span class="p">,</span> <span class="s">&#39;26:26:26&#39;</span><span class="p">])</span>
+		<span class="k">print</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">list</span><span class="p">())</span>
+
+	<span class="k">def</span> <span class="nf">test_match_intervals</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Retrieve all nodes matching a given criteria &quot;&quot;&quot;</span>
+		
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">intervals</span><span class="p">:</span>
+			<span class="n">it</span><span class="o">.</span><span class="n">insert_interval</span><span class="p">(</span> <span class="n">i</span> <span class="p">)</span>
+		<span class="n">it</span><span class="o">.</span><span class="n">to_binary_tree</span><span class="p">()</span><span class="o">.</span><span class="n">display</span><span class="p">()</span>
+
+		
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">match_intervals</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">high</span> <span class="o">&lt;</span> <span class="mi">15</span> <span class="p">)),</span> <span class="mi">4</span><span class="p">)</span>
+
+	
+	<span class="k">def</span> <span class="nf">test_match_intervals</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Retrieve all nodes matching a given criteria: empty tree &quot;&quot;&quot;</span>
+		
+		<span class="n">it</span> <span class="o">=</span> <span class="n">IntervalTree</span><span class="p">()</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span> <span class="nb">len</span><span class="p">(</span><span class="n">it</span><span class="o">.</span><span class="n">match_intervals</span><span class="p">(</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">interval</span><span class="o">.</span><span class="n">high</span> <span class="o">&lt;</span> <span class="mi">15</span> <span class="p">)),</span> <span class="mi">0</span><span class="p">)</span>
+
+	
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+        <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+        <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Interval Tree 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2017, NPR.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
