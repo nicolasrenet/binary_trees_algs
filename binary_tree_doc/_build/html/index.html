@@ -1,0 +1,374 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to Binary Search Tree’s documentation! &#8212; Binary Search Tree 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Binary Search Tree 1.0 documentation" href="#" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Binary Search Tree 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-binary-search-tree-s-documentation">
+<h1>Welcome to Binary Search Tree&#8217;s documentation!<a class="headerlink" href="#welcome-to-binary-search-tree-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+</div>
+<span class="target" id="module-queue"></span><dl class="class">
+<dt id="queue.OverflowException">
+<em class="property">class </em><code class="descclassname">queue.</code><code class="descname">OverflowException</code><a class="reference internal" href="_modules/queue.html#OverflowException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#queue.OverflowException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="queue.UnderflowException">
+<em class="property">class </em><code class="descclassname">queue.</code><code class="descname">UnderflowException</code><a class="reference internal" href="_modules/queue.html#UnderflowException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#queue.UnderflowException" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="queue.Queue">
+<em class="property">class </em><code class="descclassname">queue.</code><code class="descname">Queue</code><span class="sig-paren">(</span><em>size=100</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/queue.html#Queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#queue.Queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>As simplistic queue implementation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tail</strong> &#8211; the tail pointer</li>
+<li><strong>head</strong> &#8211; the head pointer</li>
+<li><strong>array</strong> &#8211; the array containing the elements of the queue</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="queue.Queue.dequeue">
+<code class="descname">dequeue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/queue.html#Queue.dequeue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#queue.Queue.dequeue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dequeue an element from the queue.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an object reference</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">object</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><strong>UnderflowException</strong> &#8211; when attempting at dequeuing from an empty queue.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="queue.Queue.enqueue">
+<code class="descname">enqueue</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/queue.html#Queue.enqueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#queue.Queue.enqueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enqueue a new elemnent in the queue.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>object</em>) &#8211; an object reference</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><strong>OverflowException</strong> &#8211; when attempting at enqueuing in a full queue.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="queue.Queue.is_empty">
+<code class="descname">is_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/queue.html#Queue.is_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#queue.Queue.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the queue is empty.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the queue is empty; False otherwise</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="module-bst_skeleton"></span><dl class="class">
+<dt id="bst_skeleton.Node">
+<em class="property">class </em><code class="descclassname">bst_skeleton.</code><code class="descname">Node</code><span class="sig-paren">(</span><em>key=None</em>, <em>left=None</em>, <em>right=None</em>, <em>parent=None</em>, <em>depth=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bst_skeleton.html#Node"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bst_skeleton.Node" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tree element.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> &#8211; the key value</li>
+<li><strong>left</strong> &#8211; reference to the left child</li>
+<li><strong>right</strong> &#8211; reference to the right child</li>
+<li><strong>parent</strong> &#8211; reference to the parent</li>
+<li><strong>depth</strong> &#8211; depth of the node</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="bst_skeleton.Node.add_left">
+<code class="descname">add_left</code><span class="sig-paren">(</span><em>left</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bst_skeleton.html#Node.add_left"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bst_skeleton.Node.add_left" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function: create a L child</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bst_skeleton.Node.add_right">
+<code class="descname">add_right</code><span class="sig-paren">(</span><em>right</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bst_skeleton.html#Node.add_right"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bst_skeleton.Node.add_right" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function: create a R child</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="bst_skeleton.BinaryTree">
+<em class="property">class </em><code class="descclassname">bst_skeleton.</code><code class="descname">BinaryTree</code><span class="sig-paren">(</span><em>root=None</em>, <em>array=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bst_skeleton.html#BinaryTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bst_skeleton.BinaryTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>A binary tree implementation.</p>
+<table class="docutils field-list" frame="void" id="root" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>root</strong> &#8211; a reference to the root node</li>
+<li><strong>height</strong> &#8211; the height of the tree (length of a path from the root to a leaf)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p id="description">The methods to be implemented in this module  (<a class="reference internal" href="#preorder-walk">preorder_walk</a>, <a class="reference internal" href="#postorder-walk">postorder_walk</a>, <a class="reference internal" href="#is-bst">is_bst</a>) essentially use recursion to accomplish their task, but the purely recursive part is nested into the method, that takes care of bootstrapping  the inner procedure, providing the actual parameters for the top call. The general outline of these functions follows.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_method</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">...</span> <span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">inner_recursive_procedure</span><span class="p">(</span> <span class="n">node</span><span class="p">,</span> <span class="o">...</span> <span class="p">):</span>
+                <span class="c1"># recursive blah</span>
+
+        <span class="k">return</span> <span class="n">inner_recursive_procedure</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="o">...</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the nested procedure &#8220;captures&#8221; any variable created in the scope of the wrapper procedure. If you need to update a data structure across the recursive calls, the following is valid.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_method</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">...</span> <span class="p">):</span>
+
+        <span class="n">lst</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">inner_recursive_procedure</span><span class="p">(</span> <span class="n">node</span><span class="p">,</span> <span class="o">...</span> <span class="p">):</span>
+                <span class="c1"># recursive stuff that modifies lst</span>
+        
+        <span class="n">inner_recursive_procedure</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="o">...</span> <span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">lst</span>
+</pre></div>
+</div>
+<p>You can accomplish the same thing in a cleaner, more functional style, where the data structure is constructed, and returned by the recursive procedure:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">my_method</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+        
+        <span class="k">def</span> <span class="nf">inner_recursive_procedure</span><span class="p">(</span> <span class="n">node</span><span class="p">,</span> <span class="n">lst</span><span class="p">,</span> <span class="o">...</span> <span class="p">):</span>
+                <span class="c1"># recursive stuff build a new list from lst, and return a new list</span>
+
+        <span class="k">return</span> <span class="n">inner_recursive_procedure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="p">[],</span> <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="bst_skeleton.BinaryTree.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>root=None</em>, <em>array=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bst_skeleton.html#BinaryTree.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bst_skeleton.BinaryTree.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes an empty tree</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>root</strong> (<a class="reference internal" href="#bst_skeleton.Node" title="bst_skeleton.Node"><em>Node</em></a>) &#8211; the root node reference</li>
+<li><strong>array</strong> (<em>tuple</em>) &#8211; (optional) if provided, a tree, in the form of nested lists</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bst_skeleton.BinaryTree.display">
+<code class="descname">display</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bst_skeleton.html#BinaryTree.display"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bst_skeleton.BinaryTree.display" title="Permalink to this definition">¶</a></dt>
+<dd><p>Breadth-first tree-walking, displaying the nodes on the console</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bst_skeleton.BinaryTree.is_bst">
+<code class="descname">is_bst</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bst_skeleton.html#BinaryTree.is_bst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bst_skeleton.BinaryTree.is_bst" title="Permalink to this definition">¶</a></dt>
+<dd><p id="is-bst">Check for BST property, recursively.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p>Write the procedure. The following is a common programming pattern when using recursion:</p>
+<ol class="arabic simple">
+<li>In this function, write a nested, recursive procedure, that takes a node <cite>n</cite> as a parameter and returns <cite>True</cite> if the tree rooted at <cite>n</cite> meets the BST property, and <cite>False</cite> otherwise.</li>
+<li>In a second step, <em>call</em> the inner procedure, with the <a class="reference internal" href="#root">root</a> of this tree as the first actual parameter, and other parameters as needed. Do not forget to return!</li>
+</ol>
+<p class="last">CLRS3, Exercise 12.2.1 might be a good starting point: when you walk down the tree recursively, what should you keep track of in order to check whether the BST property holds for the current node?</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if this tree is a Binary Search Tree; False otherwise.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bst_skeleton.BinaryTree.postorder_walk">
+<code class="descname">postorder_walk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bst_skeleton.html#BinaryTree.postorder_walk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bst_skeleton.BinaryTree.postorder_walk" title="Permalink to this definition">¶</a></dt>
+<dd><p id="postorder-walk">Perform a postorder tree walk.</p>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p>Implement the method, using CLRS3, 12.1 as an inspiration. Do not simply print the node, but return a list with the node keys in the desired order.</p>
+<ol class="arabic simple">
+<li>In this function, write a nested, recursive procedure, that takes a node as a parameter and walks the tree rooted at this node postorder.</li>
+<li>In a second step, <em>call</em> the inner procedure, with the <a class="reference internal" href="#root">root</a> of this tree as the actual parameter. Do not forget to return the list</li>
+</ol>
+<p class="last">There are 2 ways to populate the list. See this class&#8217; <a class="reference internal" href="#description">description</a>.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of all visited nodes, postorder</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="bst_skeleton.BinaryTree.preorder_walk">
+<code class="descname">preorder_walk</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/bst_skeleton.html#BinaryTree.preorder_walk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bst_skeleton.BinaryTree.preorder_walk" title="Permalink to this definition">¶</a></dt>
+<dd><p id="preorder-walk">Perform a preorder tree walk.</p>
+<div class="admonition-todo admonition" id="index-2">
+<p class="first admonition-title">Todo</p>
+<p>Implement the method, using CLRS3, 12.1 as an inspiration. Do not simply print the nodes, but return a list with the node keys in the desired order.</p>
+<ol class="arabic simple">
+<li>In this function, write a nested, recursive procedure, that takes a node as a parameter and walks the tree rooted at this node preorder.</li>
+<li>In a second step, <em>call</em> the inner procedure, with the <a class="reference internal" href="#root">root</a> of this tree as the actual parameter. Do not forget to return the list</li>
+</ol>
+<p class="last">There are 2 ways to populate the list. See this class&#8217; <a class="reference internal" href="#description">description</a>.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of all visited nodes, preorder</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to Binary Search Tree&#8217;s documentation!</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Binary Search Tree 1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, NPR.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.9.
+    </div>
+  </body>
+</html>
