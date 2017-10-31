@@ -72,26 +72,23 @@ def build_endpoints_schedule( rectangles ):
 	:rtype: list
 	"""
 	low_x_tree = rb.RedBlackTree()
+	high_x_tree = rb.RedBlackTree()
+
 	for rect in rectangles:
 		low_x_tree.rb_insert_node( XNode( rect ))
-	left_endpoints = low_x_tree.inorder_walk() + [ XNode.sentinel() ] 
-
-	#print([ '{}'.format(pt) for pt in left_endpoints], "Size: ", len(left_endpoints))
-
-
-	high_x_tree = rb.RedBlackTree()
-	for rect in rectangles:
 		high_x_tree.rb_insert_node( XNode( rect, high_x=True ))
+
+	left_endpoints = low_x_tree.inorder_walk() + [ XNode.sentinel() ] 
 	right_endpoints = high_x_tree.inorder_walk() + [ XNode.sentinel() ]
 
-	#print([ '{}'.format(pt) for pt in right_endpoints], len(right_endpoints))
-	
 	# Merge the two sets of points
 	pos_l, pos_r = 0, 0
 
 	schedule = [None] * (len(rectangles)*2)
 	for i in range(0, len(schedule)):
-		# L endpoints comes first
+		# L endpoints come first: in case of 2 x-adjacent rectangles, the incoming rectangle 
+		# (associated with the L-point) must be (tentatively) added to the y-tree before we
+		# remove the exiting rectangle (associated with the R-point)
 		if left_endpoints[ pos_l ].key <= right_endpoints[ pos_r ].key:
 			schedule[i] = left_endpoints[ pos_l ]
 			pos_l += 1
@@ -130,7 +127,7 @@ def has_overlap( rectangles ):
 
 		
 
-class VLSI_UniTest( unittest.TestCase ):
+class VLSI_UnitTest( unittest.TestCase ):
 
 	def setUp( self ):
 
@@ -155,13 +152,31 @@ class VLSI_UniTest( unittest.TestCase ):
 			]
 
 	def test_non_overlapping( self ):
-		print("Non overlapping rectangles")
+		""" 
+		Test non-overlapping rectangles.
+
+		.. image:: _static/vlsi_grid_ok.png
+			:width: 600px
+			:align: center
+			:alt: grid of non-overlapping rects
+
+		"""
+		print("Non-overlapping rectangles")
 		
 		self.assertFalse( has_overlap( self.rectangles ) )
 
 	
 	def test_overlapping_1( self ):
-		print("Test 1")
+		""" 
+		Test overlapping rectangles (North overlap).
+
+		.. image:: _static/vlsi_grid_overlap_1.png
+			:width: 600px
+			:align: center
+			:alt: grid of overlapping rects
+		"""
+
+		print("Overlapping rectangles")
 
 		overlapping_rectangles_1 = self.rectangles[:]
 		overlapping_rectangles_1[11] = (17.5, 7, 19.5, 8.5 )
@@ -170,14 +185,30 @@ class VLSI_UniTest( unittest.TestCase ):
 			
 	
 	def test_overlapping_2( self ):
-		print("Test 2")
+		""" 
+		Test overlapping rectangles (non-intersecting sides).
+
+		.. image:: _static/vlsi_grid_overlap_2.png
+			:width: 600px
+			:align: center
+			:alt: grid of overlapping rects
+		"""
+		print("Overlapping rectangles, whose sides do not intersect")
 		overlapping_rectangles_2 = self.rectangles[:]
 		overlapping_rectangles_2[5] = (7,13.5,15,15)
 
 		self.assertTrue( has_overlap( overlapping_rectangles_2 ))
 
 	def test_overlapping_3( self ):
-		print("Test 3")
+		""" 
+		Test overlapping rectangles (West overlap).
+
+		.. image:: _static/vlsi_grid_overlap_3.png
+			:width: 600px
+			:align: center
+			:alt: grid of overlapping rects
+		"""
+		print("Overlapping rectangles")
 		overlapping_rectangles_3 = self.rectangles[:]
 		overlapping_rectangles_3[10] = (14,11,18.5,16)
 
@@ -185,7 +216,14 @@ class VLSI_UniTest( unittest.TestCase ):
 
 
 	def test_overlapping_4( self ):
-		print("Test 4")
+		""" 
+		Test overlapping rectangles (SE overlap).
+
+		.. image:: _static/vlsi_grid_overlap_4.png
+			:width: 600px
+			:align: center
+			:alt: grid of overlapping rects
+		"""
 		overlapping_rectangles_4 = self.rectangles[:]
 		overlapping_rectangles_4[5] = (5,15.5,13,17)
 		overlapping_rectangles_4[13] = (4.5,13.5,21,19)
@@ -208,6 +246,3 @@ def main():
 
 if __name__ == '__main__':
         main()
-
-
-	

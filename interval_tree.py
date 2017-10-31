@@ -75,6 +75,17 @@ class Interval():
 		"""
 		return ((self.low == interval.low) and (self.high == interval.high))
 	
+	def __eq__(self, interval):
+		"""
+		Check if this interval and the given interval have the same boundaries.
+
+		:param interval: the interval we compare this interval to
+		:type interval: Interval
+		:return: True if the two intervals have the same boundaries; False otherwise
+		:rtype: bool
+		"""
+		return ((self.low == interval.low) and (self.high == interval.high))
+	
 	def __str__(self):
 		return '[{}:{}]'.format(self.low, self.high)
 
@@ -212,7 +223,7 @@ class IntervalTree( rbt.RedBlackTree ):
 		:rtype: IntervalNode
 		"""
 		x = self.root
-		while x is not self.nil and not interval.equal( x.interval ):
+		while x is not self.nil and interval != x.interval:
 			#print("search({} against {})".format( interval, x.interval ))
 			if interval.low < x.key:
 				x = x.left
@@ -279,9 +290,17 @@ class IntervalTree_UnitTest( unittest.TestCase ):
 			Interval(16,21), Interval(17,19), Interval(19,20), Interval(25,30), Interval( 26,26))
 	
 			
-	def test_interval_equal( self ):
-		self.assertTrue( Interval(1,5).equal( Interval(1,5)))
+	def test_interval_equal_1( self ):
+		self.assertEqual( Interval(1,5), Interval(1,5))
 
+	def test_interval_equal_2( self ):
+		self.assertNotEqual( Interval(1,5), Interval(6,5))
+
+	def test_interval_equal_3( self ):
+		self.assertNotEqual( Interval(1,5), Interval(1,6))
+
+	def test_interval_equal_5( self ):
+		self.assertNotEqual( Interval(1,5), Interval(6,8))
 
 	def test_interval_overlap_true( self ):
 		self.assertTrue( Interval(1,5).overlap( Interval(0,2)))
@@ -342,7 +361,7 @@ class IntervalTree_UnitTest( unittest.TestCase ):
 			it.insert_interval( i )
 		found = it.search_overlap( Interval(22,25))
 		print("Found: Interval({},{})".format(found.interval.low, found.interval.high))
-		self.assertTrue(  found.interval.equal( Interval(15,23)))
+		self.assertEqual(  found.interval, Interval(15,23))
 
 	def test_search_overlap_2( self ):
 		""" Search overlapping interval: unsuccessful search """
@@ -371,7 +390,7 @@ class IntervalTree_UnitTest( unittest.TestCase ):
 		it.to_binary_tree().display()
 		found = it.search_interval( Interval(17,19))
 		print("Found: Interval({},{})".format(found.interval.low, found.interval.high))
-		self.assertTrue(  found.interval.equal( Interval(17,19)))
+		self.assertEqual(  found.interval,  Interval(17,19))
 
 
 	def test_search_interval_2( self ):

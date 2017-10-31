@@ -122,26 +122,23 @@
 <span class="sd">	:rtype: list</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">low_x_tree</span> <span class="o">=</span> <span class="n">rb</span><span class="o">.</span><span class="n">RedBlackTree</span><span class="p">()</span>
+	<span class="n">high_x_tree</span> <span class="o">=</span> <span class="n">rb</span><span class="o">.</span><span class="n">RedBlackTree</span><span class="p">()</span>
+
 	<span class="k">for</span> <span class="n">rect</span> <span class="ow">in</span> <span class="n">rectangles</span><span class="p">:</span>
 		<span class="n">low_x_tree</span><span class="o">.</span><span class="n">rb_insert_node</span><span class="p">(</span> <span class="n">XNode</span><span class="p">(</span> <span class="n">rect</span> <span class="p">))</span>
-	<span class="n">left_endpoints</span> <span class="o">=</span> <span class="n">low_x_tree</span><span class="o">.</span><span class="n">inorder_walk</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span> <span class="n">XNode</span><span class="o">.</span><span class="n">sentinel</span><span class="p">()</span> <span class="p">]</span> 
-
-	<span class="c">#print([ &#39;{}&#39;.format(pt) for pt in left_endpoints], &quot;Size: &quot;, len(left_endpoints))</span>
-
-
-	<span class="n">high_x_tree</span> <span class="o">=</span> <span class="n">rb</span><span class="o">.</span><span class="n">RedBlackTree</span><span class="p">()</span>
-	<span class="k">for</span> <span class="n">rect</span> <span class="ow">in</span> <span class="n">rectangles</span><span class="p">:</span>
 		<span class="n">high_x_tree</span><span class="o">.</span><span class="n">rb_insert_node</span><span class="p">(</span> <span class="n">XNode</span><span class="p">(</span> <span class="n">rect</span><span class="p">,</span> <span class="n">high_x</span><span class="o">=</span><span class="bp">True</span> <span class="p">))</span>
+
+	<span class="n">left_endpoints</span> <span class="o">=</span> <span class="n">low_x_tree</span><span class="o">.</span><span class="n">inorder_walk</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span> <span class="n">XNode</span><span class="o">.</span><span class="n">sentinel</span><span class="p">()</span> <span class="p">]</span> 
 	<span class="n">right_endpoints</span> <span class="o">=</span> <span class="n">high_x_tree</span><span class="o">.</span><span class="n">inorder_walk</span><span class="p">()</span> <span class="o">+</span> <span class="p">[</span> <span class="n">XNode</span><span class="o">.</span><span class="n">sentinel</span><span class="p">()</span> <span class="p">]</span>
 
-	<span class="c">#print([ &#39;{}&#39;.format(pt) for pt in right_endpoints], len(right_endpoints))</span>
-	
 	<span class="c"># Merge the two sets of points</span>
 	<span class="n">pos_l</span><span class="p">,</span> <span class="n">pos_r</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
 
 	<span class="n">schedule</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rectangles</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
 	<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">schedule</span><span class="p">)):</span>
-		<span class="c"># L endpoints comes first</span>
+		<span class="c"># L endpoints come first: in case of 2 x-adjacent rectangles, the incoming rectangle </span>
+		<span class="c"># (associated with the L-point) must be (tentatively) added to the y-tree before we</span>
+		<span class="c"># remove the exiting rectangle (associated with the R-point)</span>
 		<span class="k">if</span> <span class="n">left_endpoints</span><span class="p">[</span> <span class="n">pos_l</span> <span class="p">]</span><span class="o">.</span><span class="n">key</span> <span class="o">&lt;=</span> <span class="n">right_endpoints</span><span class="p">[</span> <span class="n">pos_r</span> <span class="p">]</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
 			<span class="n">schedule</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">left_endpoints</span><span class="p">[</span> <span class="n">pos_l</span> <span class="p">]</span>
 			<span class="n">pos_l</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -180,7 +177,7 @@
 
 		
 </div>
-<span class="k">class</span> <span class="nc">VLSI_UniTest</span><span class="p">(</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span> <span class="p">):</span>
+<div class="viewcode-block" id="VLSI_UnitTest"><a class="viewcode-back" href="../index.html#vlsi.VLSI_UnitTest">[docs]</a><span class="k">class</span> <span class="nc">VLSI_UnitTest</span><span class="p">(</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span> <span class="p">):</span>
 
 	<span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
 
@@ -204,46 +201,87 @@
 			<span class="p">(</span><span class="mi">26</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">27</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span>
 			<span class="p">]</span>
 
-	<span class="k">def</span> <span class="nf">test_non_overlapping</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Non overlapping rectangles&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="VLSI_UnitTest.test_non_overlapping"><a class="viewcode-back" href="../index.html#vlsi.VLSI_UnitTest.test_non_overlapping">[docs]</a>	<span class="k">def</span> <span class="nf">test_non_overlapping</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Test non-overlapping rectangles.</span>
+
+<span class="sd">		.. image:: _static/vlsi_grid_ok.png</span>
+<span class="sd">			:width: 600px</span>
+<span class="sd">			:align: center</span>
+<span class="sd">			:alt: grid of non-overlapping rects</span>
+
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Non-overlapping rectangles&quot;</span><span class="p">)</span>
 		
 		<span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span> <span class="p">)</span> <span class="p">)</span>
 
-	
-	<span class="k">def</span> <span class="nf">test_overlapping_1</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Test 1&quot;</span><span class="p">)</span>
+	</div>
+<div class="viewcode-block" id="VLSI_UnitTest.test_overlapping_1"><a class="viewcode-back" href="../index.html#vlsi.VLSI_UnitTest.test_overlapping_1">[docs]</a>	<span class="k">def</span> <span class="nf">test_overlapping_1</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Test overlapping rectangles (North overlap).</span>
+
+<span class="sd">		.. image:: _static/vlsi_grid_overlap_1.png</span>
+<span class="sd">			:width: 600px</span>
+<span class="sd">			:align: center</span>
+<span class="sd">			:alt: grid of overlapping rects</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Overlapping rectangles&quot;</span><span class="p">)</span>
 
 		<span class="n">overlapping_rectangles_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span><span class="p">[:]</span>
 		<span class="n">overlapping_rectangles_1</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">17.5</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mf">19.5</span><span class="p">,</span> <span class="mf">8.5</span> <span class="p">)</span>
 
 		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="n">overlapping_rectangles_1</span> <span class="p">))</span>
 			
-	
-	<span class="k">def</span> <span class="nf">test_overlapping_2</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Test 2&quot;</span><span class="p">)</span>
+	</div>
+<div class="viewcode-block" id="VLSI_UnitTest.test_overlapping_2"><a class="viewcode-back" href="../index.html#vlsi.VLSI_UnitTest.test_overlapping_2">[docs]</a>	<span class="k">def</span> <span class="nf">test_overlapping_2</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Test overlapping rectangles (non-intersecting sides).</span>
+
+<span class="sd">		.. image:: _static/vlsi_grid_overlap_2.png</span>
+<span class="sd">			:width: 600px</span>
+<span class="sd">			:align: center</span>
+<span class="sd">			:alt: grid of overlapping rects</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Overlapping rectangles, whose sides do not intersect&quot;</span><span class="p">)</span>
 		<span class="n">overlapping_rectangles_2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span><span class="p">[:]</span>
 		<span class="n">overlapping_rectangles_2</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mf">13.5</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">)</span>
 
 		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="n">overlapping_rectangles_2</span> <span class="p">))</span>
+</div>
+<div class="viewcode-block" id="VLSI_UnitTest.test_overlapping_3"><a class="viewcode-back" href="../index.html#vlsi.VLSI_UnitTest.test_overlapping_3">[docs]</a>	<span class="k">def</span> <span class="nf">test_overlapping_3</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Test overlapping rectangles (West overlap).</span>
 
-	<span class="k">def</span> <span class="nf">test_overlapping_3</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Test 3&quot;</span><span class="p">)</span>
+<span class="sd">		.. image:: _static/vlsi_grid_overlap_3.png</span>
+<span class="sd">			:width: 600px</span>
+<span class="sd">			:align: center</span>
+<span class="sd">			:alt: grid of overlapping rects</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Overlapping rectangles&quot;</span><span class="p">)</span>
 		<span class="n">overlapping_rectangles_3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span><span class="p">[:]</span>
 		<span class="n">overlapping_rectangles_3</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mf">18.5</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span>
 
 		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="n">overlapping_rectangles_3</span> <span class="p">))</span>
 
+</div>
+<div class="viewcode-block" id="VLSI_UnitTest.test_overlapping_4"><a class="viewcode-back" href="../index.html#vlsi.VLSI_UnitTest.test_overlapping_4">[docs]</a>	<span class="k">def</span> <span class="nf">test_overlapping_4</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">		Test overlapping rectangles (SE overlap).</span>
 
-	<span class="k">def</span> <span class="nf">test_overlapping_4</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Test 4&quot;</span><span class="p">)</span>
+<span class="sd">		.. image:: _static/vlsi_grid_overlap_4.png</span>
+<span class="sd">			:width: 600px</span>
+<span class="sd">			:align: center</span>
+<span class="sd">			:alt: grid of overlapping rects</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="n">overlapping_rectangles_4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span><span class="p">[:]</span>
 		<span class="n">overlapping_rectangles_4</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mf">15.5</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">17</span><span class="p">)</span>
 		<span class="n">overlapping_rectangles_4</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">4.5</span><span class="p">,</span><span class="mf">13.5</span><span class="p">,</span><span class="mi">21</span><span class="p">,</span><span class="mi">19</span><span class="p">)</span>
 
 		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="n">overlapping_rectangles_4</span> <span class="p">))</span>
 
-	
-	<span class="k">def</span> <span class="nf">test_overlapping_5</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+	</div>
+<div class="viewcode-block" id="VLSI_UnitTest.test_overlapping_5"><a class="viewcode-back" href="../index.html#vlsi.VLSI_UnitTest.test_overlapping_5">[docs]</a>	<span class="k">def</span> <span class="nf">test_overlapping_5</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot; Rectangles touch, but do not overlap &quot;&quot;&quot;</span>
 		<span class="k">print</span><span class="p">(</span><span class="s">&quot;Touching rectangles&quot;</span><span class="p">)</span>
 		<span class="n">overlapping_rectangles_5</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rectangles</span><span class="p">[:]</span>
@@ -252,15 +290,12 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span> <span class="n">has_overlap</span><span class="p">(</span> <span class="n">overlapping_rectangles_5</span> <span class="p">))</span>
 			
 
-
+</div></div>
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
         <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
 
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
         <span class="n">main</span><span class="p">()</span>
-
-
-	
 </pre></div>
 
           </div>

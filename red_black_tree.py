@@ -272,9 +272,9 @@ class RedBlackTree( bt.BinaryTree ):
 		x.color = Color.BLACK
 
 	def tree_minimum( self, node ):
-		""" In the subtree rooted at the given node, Retrieve the node with the minimum key 
+		""" In the subtree rooted at the given node, retrieve the node with the minimum key.
 
-		:param node: root of the subtree to be searched.
+		:param node: root of the subtree to be searched
 		:type node: rbNode
 		:return: the node with the minimum key, i.e. the leftmost node in the subtree
 		:rtype: rbNode
@@ -307,7 +307,7 @@ class RedBlackTree( bt.BinaryTree ):
 
 		:param func: an optional reference to a procedure that extracts information for the visited nodes
 		:type func: function
-		:return: a list of nodes by default (or other information returned by the function passed as an optional parameter
+		:return: a list of nodes by default (or other information returned by the function passed as an optional parameter)
 		:rtype: list
 		"""
 		def inorder_rec( node, lst ):

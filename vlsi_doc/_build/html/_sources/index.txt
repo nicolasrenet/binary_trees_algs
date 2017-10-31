@@ -22,7 +22,8 @@ Contents:
 	build_endpoints_schedule
 .. autofunction::
 	has_overlap
-
+.. autoclass:: VLSI_UnitTest
+	:members:
 
 Indices and tables
 ==================
