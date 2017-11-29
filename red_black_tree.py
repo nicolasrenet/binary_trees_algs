@@ -433,7 +433,8 @@ class RedBlackTree( bt.BinaryTree ):
 			if node.right is not self.nil:
 				inorder_rec( node.right, lst)
 			return lst	
-
+		if self.root is self.nil:
+			return []
 		return inorder_rec( self.root, [])
 
 	def to_binary_tree(self):
@@ -444,7 +445,8 @@ class RedBlackTree( bt.BinaryTree ):
 		"""
 		return bt.BinaryTree( array=self.to_array() )
 
-			
+	def list(self):
+		return bt.BinaryTree(self.to_array()).list()
 
 
 class RedBlackTreeUniTest( unittest.TestCase ):

@@ -134,7 +134,8 @@ class BinaryTree():
 				preorder_rec( node.right)
 
 		lst = []	
-		preorder_rec( self.root)
+		if self.root is not None:
+			preorder_rec( self.root)
 		return lst
 	
 	def preorder_rl_walk( self ):
@@ -154,7 +155,8 @@ class BinaryTree():
 				preorder_rec( node.left)
 
 		lst = []	
-		preorder_rec( self.root)
+		if self.root is not None:
+			preorder_rec( self.root)
 		return lst
 	
 	def postorder_walk( self ):
@@ -174,6 +176,8 @@ class BinaryTree():
 			lst.append( node.key )
 			return lst	
 
+		if self.root is None:
+			return []
 		return postorder_rec( self.root, [])
 	
 
@@ -193,8 +197,9 @@ class BinaryTree():
 				postorder_rec( node.left)
 			lst.append( node.key )
 
-		lst = []	
-		postorder_rec( self.root)
+		lst = []
+		if self.root is not None:
+			postorder_rec( self.root)
 		return lst
 
 	def inorder_walk( self ):
@@ -214,6 +219,8 @@ class BinaryTree():
 				inorder_rec( node.right, lst)
 			return lst	
 
+		if self.root is None:
+			return []
 		return inorder_rec( self.root, [])
 	
 	def inorder_rl_walk( self ):
@@ -233,6 +240,8 @@ class BinaryTree():
 				inorder_rl_rec( node.left, lst)
 			return lst	
 
+		if self.root is None:
+			return None
 		return inorder_rl_rec( self.root, [])
 	
 
@@ -259,6 +268,10 @@ class BinaryTree():
 	def bfs_walk( self ):
 		queue = deque()
 		walk=[]
+
+		if self.root is None:
+			return walk
+
 		queue.enqueue(self.root)
 		while len(queue)>0:
 			x = queue.popleft()
@@ -275,6 +288,10 @@ class BinaryTree():
 	def bfs_rl_walk( self ):
 		queue = deque()
 		walk=[]
+
+		if self.root is None:
+			return walk
+
 		queue.append(self.root)
 		while len(queue)>0 :
 			x = queue.popleft()
