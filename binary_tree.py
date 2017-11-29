@@ -2,7 +2,7 @@
 
 import unittest
 import math
-from queue import *
+from collections import deque
 
 class Node():
 
@@ -257,34 +257,34 @@ class BinaryTree():
 		return is_bst_recursive( self.root, -infty, infty )	
 
 	def bfs_walk( self ):
-		queue = Queue( 2**(self.height+1) - 1)
+		queue = deque()
 		walk=[]
 		queue.enqueue(self.root)
-		while not queue.is_empty():
-			x = queue.dequeue()
+		while len(queue)>0:
+			x = queue.popleft()
 
 			walk.append(x.key)
 
 			if x.left:
-				queue.enqueue(x.left)
+				queue.popleft(x.left)
 			if x.right:
-				queue.enqueue(x.right)
+				queue.popleft(x.right)
 		return walk
 
 	
 	def bfs_rl_walk( self ):
-		queue = Queue( 2**(self.height+1) - 1)
+		queue = deque()
 		walk=[]
-		queue.enqueue(self.root)
-		while not queue.is_empty():
-			x = queue.dequeue()
+		queue.append(self.root)
+		while len(queue)>0 :
+			x = queue.popleft()
 
 			walk.append(x.key)
 
 			if x.right:
-				queue.enqueue(x.right)
+				queue.append(x.right)
 			if x.left:
-				queue.enqueue(x.left)
+				queue.append(x.left)
 		return walk
 
 	
@@ -357,7 +357,7 @@ class BinaryTree():
 		"""
 		if self.root is None:
 			return
-		q = Queue(200)
+		q = deque()
 		
 		# overall width is function of the height of the tree
 		root_pos = ((1<<(self.height+1))-1)
@@ -367,9 +367,9 @@ class BinaryTree():
 		edge_def=[]
 		label_offset=0
 		consumed=0
-		q.enqueue((self.root,root_pos))
-		while not q.is_empty():
-			(n, n_pos) = q.dequeue()
+		q.append((self.root,root_pos))
+		while len( q ) >0:
+			(n, n_pos) = q.popleft()
 
 			# starting a row: using absolute position for offset
 			if n.depth != prev_depth or n is self.root:
@@ -397,10 +397,10 @@ class BinaryTree():
 			# enqueue children, computing edge boundaries at the same time
 			edge_length = int(math.ceil(root_pos/(2**(n.depth+1))))
 			if n.left is not None:
-				q.enqueue( (n.left, int(n_pos - edge_length)) )
+				q.append( (n.left, int(n_pos - edge_length)) )
 				edge_def.append( ('L', int(n_pos - edge_length),n_pos) )
 			if n.right is not None:
-				q.enqueue( (n.right, int(n_pos + edge_length)) )
+				q.append( (n.right, int(n_pos + edge_length)) )
 				edge_def.append(  ('R', n_pos+1,int(n_pos + edge_length)) )
 		print('')			
 		
