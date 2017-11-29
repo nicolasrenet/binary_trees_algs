@@ -16,6 +16,9 @@ class rbNode( bt.Node ):
 		
 		super().__init__( key, left, right )
 		self.color = color
+
+	def __str__(self):
+		return '{}'.format(self.key)
 	
 class RedBlackTree( bt.BinaryTree ):
 
@@ -76,20 +79,24 @@ class RedBlackTree( bt.BinaryTree ):
 
 
 
-	def rb_insert( self, k ):
+	def rb_insert( self, k, comparable_func=None ):
 		""" Insert a key in the tree.
 		
 		Create a new node from the given key, and insert it into the tree.
 
 		:param k: a key.
-		:type k: int
+		:type k: object
+		:param comparable_func: a Boolean function that checks a relationship between the key to be inserted and the key at the current node, before performing the key comparison; if it returns False, the insertion attempt aborts.
+		:type comparable_func: function
+		:return: True after a successful insertion; False otherwise.
+		:rtype: bool
 		"""
 
 		z = rbNode( k, left=self.nil, right=self.nil )
 
-		self.rb_insert_node( z )
+		return self.rb_insert_node( z, comparable_func=comparable_func )
 
-	def rb_insert_node( self, z, fix_attribute_func=None ):
+	def rb_insert_node( self, z, fix_attribute_func=None, comparable_func=None  ):
 		""" 
 		Insert a node into the tree.
 
@@ -99,6 +106,10 @@ class RedBlackTree( bt.BinaryTree ):
 		:type z: rbNode
 		:param fix_attribute_func: a function that is to be called on the inserted node, typically used in augmented trees to update an attribute on the ancestors
 		:type fix_attribute_func: function
+		:param comparable_func: a Boolean function that checks a relationship between the key to be inserted and the key at the current node, before performing the key comparison; if it returns False, the insertion attempt aborts.
+		:type comparable_func: function
+		:return: True after a successful insertion; False otherwise.
+		:rtype: bool
 		"""
 
 		y = self.nil
@@ -108,6 +119,7 @@ class RedBlackTree( bt.BinaryTree ):
 			#print("Iteration")
 			#print("x.key={} z.key={}".format(x.key, z.key))
 			y = x
+			if comparable_func and not comparable_func( z.key, x.key): return  False
 			if z.key < x.key:
 				#print("x={}".format( x.left ))
 				x = x.left
@@ -116,6 +128,8 @@ class RedBlackTree( bt.BinaryTree ):
 
 		if y is self.nil:
 			self.root = z
+		elif comparable_func and not comparable_func( z.key, y.key):
+			return False
 		elif z.key < y.key:
 			y.left = z
 		else: 
@@ -127,6 +141,8 @@ class RedBlackTree( bt.BinaryTree ):
 		if fix_attribute_func:
 			fix_attribute_func( z )
 		self.rb_insert_fixup( z )
+
+		return True
 
 
 	def rb_insert_fixup( self, z):
@@ -219,11 +235,12 @@ class RedBlackTree( bt.BinaryTree ):
 			self.rb_delete_fixup( x )
 
 
+
 	def rb_delete_fixup(self, x ):
 		""" After deleting a node, restore the Red-Black properties on the subtree affected by the change.
 
-		:param z: the node whose ancestors should be fixed.
-		:type z: rbNode
+		:param x: the node whose ancestors should be fixed.
+		:type x: rbNode
 		"""
 		while x is not self.root and x.color == Color.BLACK:
 			if x is x.parent.left:
@@ -271,6 +288,52 @@ class RedBlackTree( bt.BinaryTree ):
 				
 		x.color = Color.BLACK
 
+	def delete_key( self, key, fix_attribute_func=None ):
+		""" Remove the key from the tree, and return it.
+	
+		.. warning::
+			 The key might not be unique; in this case, the first node that carries the key is deleted.
+	
+		:param key: a key value
+		:type key: object
+		:param fix_attribute_func: a function that is to be called on the lowest node affected by the change, typically used in augmented trees to update an attribute on the ancestors
+		:type fix_attribute_func: function
+		:return: the key at the deleted node, if it exists; None otherwise
+		:rtype: object
+		"""
+		node_to_delete = self.search( key )
+		if node_to_delete is None:
+			return None
+		value = node_to_delete.key
+		self.rb_delete( node_to_delete, fix_attribute_func )
+		
+		return value
+
+############# QUERY METHODS #########################
+
+	def search(self,key):
+		""" 
+		Search for the node that contains the given key.
+
+		If multiple nodes contain the same key, the first node to be visited will be returned.
+		:param key: the value to be searched.
+		:type key: object
+		:return: the node containing the key, if it exists; None otherwise
+		:rtype: bool
+		"""
+		def search_rec(x):
+			if x is self.nil:
+				return None
+			if x.key == key:
+				return x
+			if key < x.key:
+				return search_rec(x.left)
+			else:
+				return search_rec(x.right)
+
+		return search_rec(self.root)
+
+
 	def tree_minimum( self, node ):
 		""" In the subtree rooted at the given node, retrieve the node with the minimum key.
 
@@ -283,6 +346,56 @@ class RedBlackTree( bt.BinaryTree ):
 			while node.left is not self.nil:
 				node = node.left
 		return node
+
+	def tree_maximum( self, node ):
+		""" In the subtree rooted at the given node, retrieve the node with the maximum key.
+
+		:param node: root of the subtree to be searched
+		:type node: rbNode
+		:return: the node with the maximum key, i.e. the rightmost node in the subtree
+		:rtype: rbNode
+		"""
+		if node is not self.nil:
+			while node.right is not self.nil:
+				node = node.right
+		return node
+
+	def successor(self, node):
+		""" Retrieve the successor of the given node.
+
+		:param node: a node in the tree
+		:type node: rbNode
+		:return: node that contains the smallest key that is larger than the node's key
+		:rtype: rbNode
+		"""
+		if node.right is not self.nil:
+			return self.tree_minimum(node.right)
+		y = node.parent
+		while y is not self.nil and node is y.right:
+			node = y
+			y = y.parent
+		if y is self.nil:
+			return None
+		return y
+
+	def predecessor(self, node):
+		""" Retrieve the predecessor of the given node.
+
+		:param node: a node in the tree
+		:type node: rbNode
+		:return: node that contains the highest key that is smaller than the node's key
+		:rtype: rbNode
+		"""
+		if node.left is not self.nil:
+			return self.tree_maximum(node.left)
+		y = node.parent
+		while y is not self.nil and node is y.left:
+			node = y
+			y = y.parent
+		if y is self.nil:
+			return None
+		return y
+		
 
 	def to_array( self ):
 		""" Return a nested list representation of the tree.

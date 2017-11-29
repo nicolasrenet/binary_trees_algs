@@ -27,10 +27,10 @@ class BST(bt.BinaryTree):
 			self.update_from_array( array )
 		else:
 			for k in keys:
-				self.insert( k )
+				self.insert_key( k )
 
 			
-	def insert_node(self, node):
+	def insert_node(self, node, comparable_func=None):
 		"""
 		.. _insert_node:
 
@@ -38,6 +38,10 @@ class BST(bt.BinaryTree):
 
 		:param key: a key
 		:type key: int
+		:param comparable_func: a Boolean function that checks a condition on the node to be inserted before performing the key comparison; if it returns False, the insertion attempt aborts.
+		:type comparable_func: func
+		:return: True if the insertion successed; False otherwise
+		:rtype: bool
 		"""
 		y = None
 		x = self.root
@@ -46,6 +50,7 @@ class BST(bt.BinaryTree):
 		while x is not None:
 			y = x
 			depth += 1
+			if comparable_func and not comparable_func( node.key, x.key): return  False
 			if node.key < x.key:
 				x = x.left
 			else:
@@ -62,14 +67,17 @@ class BST(bt.BinaryTree):
 		if (y is None):
 			self.root = node
 		 
+		elif comparable_func and not comparable_func( node.key, y.key ): return False
 		elif node.key < y.key:
 			y.left = node 
 		else:
 			y.right = node
 
-	def insert_key( self, key):
+		return True
+
+	def insert_key( self, key, comparable_func=None):
 	
-		self.insert( Node(key) )
+		return self.insert_node( bt.Node(key), comparable_func )
 
 
 	def transplant(self, u, v):
@@ -106,7 +114,7 @@ class BST(bt.BinaryTree):
 
 		Delete a node from the tree.
 
-		:param z: node
+		:param z: a node
 		:type z: bt.Node
 		"""
 		if z.left is None:
@@ -124,6 +132,19 @@ class BST(bt.BinaryTree):
 			y.left = z.left
 			y.left.parent = y
 
+
+	def delete_key(self, key):
+		""" 
+		Remove the key from the tree, and return it.
+		"""
+		node_to_delete = self.search(key)
+
+		if node_to_delete is None:
+			return None
+		value = node_to_delete.key
+		self.delete( node_to_delete )
+		return value
+		
 
 ############## TREE QUERIES ######################
 
@@ -196,7 +217,7 @@ class BST_UnitTest(unittest.TestCase):
 	def test_walk(self):
 		bst=BST()
 		for k in [15,7,3,21,19,24,7,67,8,9]:
-			bst.insert(k)
+			bst.insert_key(k)
 
 		self.assertEqual( bst.list(), [3,7,7,8,9,15,19,21,24,67])
 
@@ -205,7 +226,7 @@ class BST_UnitTest(unittest.TestCase):
 	def test_non_recursive_inorder_walk(self):
 		bst=BST()
 		for k in [15,7,3,21,19,24,10,67,12,14,2,4,8]:
-			bst.insert(k)
+			bst.insert_key(k)
 
 		bst.display()
 
@@ -215,23 +236,23 @@ class BST_UnitTest(unittest.TestCase):
 	def test_search(self):
 		bst=BST()
 		for k in [15,7,3,98,21,19,124,24,10,67,12,14,2,4,8,35]:
-			bst.insert(k)
+			bst.insert_key(k)
 		bst.display()
 		bst=BST()
 		for k in [78,32,212,23,11,55,36,10,43,57,35]:
-			bst.insert(k)
+			bst.insert_key(k)
 		bst.display()
 
 		bst=BST()
 		for k in [100,45,12,89,34,36,1,24,12,9,35]:
-			bst.insert(k)
+			bst.insert_key(k)
 		bst.display()
 
 
 	def test_minimum_non_rec(self):
 		bst = BST()
 		for k in [15,7,3,21,19,24,10,67,12,14,2,4,8]:
-			bst.insert(k)
+			bst.insert_key(k)
 		bst.display()
 		self.assertEqual( bst.minimum(), bst.search(2) )
 
@@ -239,7 +260,7 @@ class BST_UnitTest(unittest.TestCase):
 	def test_minimum_rec(self):
 		bst = BST()
 		for k in [15,7,3,21,19,24,10,67,12,14,2,4,8]:
-			bst.insert(k)
+			bst.insert_key(k)
 		bst.display()
 		self.assertEqual( bst.minimum_recursive(), bst.search(2) )
 
@@ -247,7 +268,7 @@ class BST_UnitTest(unittest.TestCase):
 		""" Successor is in R subtree """
 		bst = BST()
 		for k in [15,7,3,21,19,24,10,67,12,14,2,4,8]:
-			bst.insert(k)
+			bst.insert_key(k)
 		bst.display()
 		self.assertEqual( bst.successor( bst.search(7)), bst.search(8)) 
 
@@ -255,7 +276,7 @@ class BST_UnitTest(unittest.TestCase):
 		""" Successor is an ancestor """
 		bst = BST()
 		for k in [15,7,3,21,19,24,10,67,12,14,2,4,8]:
-			bst.insert(k)
+			bst.insert_key(k)
 		bst.display()
 		self.assertEqual( bst.successor( bst.search(14)), bst.search(15)) 
 
@@ -264,7 +285,7 @@ class BST_UnitTest(unittest.TestCase):
 		""" Predecessor is in L subtree """
 		bst = BST()
 		for k in [15,7,3,21,19,24,10,67,12,14,2,4,8]:
-			bst.insert(k)
+			bst.insert_key(k)
 		bst.display()
 		self.assertEqual( bst.predecessor( bst.search(7)), bst.search(4)) 
 
@@ -272,7 +293,7 @@ class BST_UnitTest(unittest.TestCase):
 		""" Predecessor is an ancestor """
 		bst = BST()
 		for k in [15,7,3,21,19,24,10,67,12,14,2,4,8]:
-			bst.insert(k)
+			bst.insert_key(k)
 		bst.display()
 		self.assertEqual( bst.predecessor( bst.search(8)), bst.search(7)) 
 
@@ -281,7 +302,7 @@ class BST_UnitTest(unittest.TestCase):
 	def test_search(self):
 		bst=BST()
 		for k in [15,7,3,21,19,24,7,67,8,9]:
-			bst.insert(k)
+			bst.insert_key(k)
 
 		x = bst.search( 24 )
 
@@ -290,7 +311,7 @@ class BST_UnitTest(unittest.TestCase):
 	def test_transplant(self):
 		bst1=BST()
 		for k in [15,7,3,21,19,24,7,67,8,9]:
-			bst1.insert(k)
+			bst1.insert_key(k)
 
 		print('\ntest_transplant: ')
 		print('	BEFORE: target tree:')
@@ -298,9 +319,9 @@ class BST_UnitTest(unittest.TestCase):
 		bst1.display()
 		
 		bst2 = BST()	
-		bst2.insert( 22 )
-		bst2.insert( 26 )
-		bst2.insert( 25 )
+		bst2.insert_key( 22 )
+		bst2.insert_key( 26 )
+		bst2.insert_key( 25 )
 
 		print(' grafted subtree: ')	
 		bst2.display()
@@ -320,7 +341,7 @@ class BST_UnitTest(unittest.TestCase):
 		
 		bst=BST()
 		for k in [15,7,3,21,19,24,7,67,8,9,1]:
-			bst.insert(k)
+			bst.insert_key(k)
 
 		print('\ntest_delete (a) z (24) has no left child:')
 		print('	BEFORE: ')
@@ -337,7 +358,7 @@ class BST_UnitTest(unittest.TestCase):
 		
 		bst=BST()
 		for k in [15,7,3,21,19,24,7,67,8,9,1]:
-			bst.insert(k)
+			bst.insert_key(k)
 
 		print('\ntest_delete (b) z (3) has no right child:')
 		print('	BEFORE: ')
@@ -354,7 +375,7 @@ class BST_UnitTest(unittest.TestCase):
 		
 		bst=BST()
 		for k in [15,7,3,21,19,24,7,67,8,9]:
-			bst.insert(k)
+			bst.insert_key(k)
 
 		print('\ntest_delete (c) z (21) has 2 children, y is z\'s right child:')
 		print('	BEFORE: ')
@@ -371,7 +392,7 @@ class BST_UnitTest(unittest.TestCase):
 		
 		bst=BST()
 		for k in [15,7,3,21,19,24,7,67,8,9]:
-			bst.insert(k)
+			bst.insert_key(k)
 
 		print('\ntest_delete (d) z (15) has 2 children, y is not z\'s right child:')
 		print('	BEFORE: ')
