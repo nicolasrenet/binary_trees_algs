@@ -75,8 +75,8 @@ def build_endpoints_schedule( rectangles ):
 	high_x_tree = rb.RedBlackTree()
 
 	for rect in rectangles:
-		low_x_tree.rb_insert_node( XNode( rect ))
-		high_x_tree.rb_insert_node( XNode( rect, high_x=True ))
+		low_x_tree.insert_node( XNode( rect ))
+		high_x_tree.insert_node( XNode( rect, high_x=True ))
 
 	left_endpoints = low_x_tree.inorder_walk() + [ XNode.sentinel() ] 
 	right_endpoints = high_x_tree.inorder_walk() + [ XNode.sentinel() ]

@@ -21,7 +21,10 @@ class rbNode( bt.Node ):
 		return '{}'.format(self.key)
 	
 class RedBlackTree( bt.BinaryTree ):
+	"""
+	.. _RedBlackTree:
 
+	"""
 
 	def __init__(self):
 		super().__init__()
@@ -79,7 +82,7 @@ class RedBlackTree( bt.BinaryTree ):
 
 
 
-	def rb_insert( self, k, comparable_func=None ):
+	def insert_key( self, k, comparable_func=None ):
 		""" Insert a key in the tree.
 		
 		Create a new node from the given key, and insert it into the tree.
@@ -94,9 +97,9 @@ class RedBlackTree( bt.BinaryTree ):
 
 		z = rbNode( k, left=self.nil, right=self.nil )
 
-		return self.rb_insert_node( z, comparable_func=comparable_func )
+		return self.insert_node( z, comparable_func=comparable_func )
 
-	def rb_insert_node( self, z, fix_attribute_func=None, comparable_func=None  ):
+	def insert_node( self, z, fix_attribute_func=None, comparable_func=None  ):
 		""" 
 		Insert a node into the tree.
 
@@ -140,12 +143,12 @@ class RedBlackTree( bt.BinaryTree ):
 
 		if fix_attribute_func:
 			fix_attribute_func( z )
-		self.rb_insert_fixup( z )
+		self.insert_fixup( z )
 
 		return True
 
 
-	def rb_insert_fixup( self, z):
+	def insert_fixup( self, z):
 		""" After inserting a node, restore the Red-Black properties on its ancestors.
 
 		:param z: the node just inserted
@@ -184,7 +187,7 @@ class RedBlackTree( bt.BinaryTree ):
 
 
 
-	def rb_transplant(self, u, v):
+	def transplant(self, u, v):
 		if u.parent is self.nil:
 			self.root = v
 		elif u is u.parent.left:
@@ -195,7 +198,7 @@ class RedBlackTree( bt.BinaryTree ):
 
 
 
-	def rb_delete(self, z, fix_attribute_func=None ):
+	def delete_node(self, z, fix_attribute_func=None ):
 		""" 
 		Delete a node from the tree.
 
@@ -210,10 +213,10 @@ class RedBlackTree( bt.BinaryTree ):
 		y_original_color = y.color
 		if z.left is self.nil:
 			x = z.right
-			self.rb_transplant( z, z.right )
+			self.transplant( z, z.right )
 		elif z.right is self.nil:
 			x = z.left
-			self.rb_transplant( z, z.left )
+			self.transplant( z, z.left )
 		else:
 			y = self.tree_minimum( z.right )
 			y_original_color = y.color
@@ -221,10 +224,10 @@ class RedBlackTree( bt.BinaryTree ):
 			if y.parent is z:
 				x.parent = y
 			else:
-				self.rb_transplant( y, y.right )
+				self.transplant( y, y.right )
 				y.right = z.right
 				y.right.parent = y
-			self.rb_transplant( z, y)
+			self.transplant( z, y)
 			y.left = z.left
 			y.left.parent = y
 			y.color = z.color
@@ -232,11 +235,11 @@ class RedBlackTree( bt.BinaryTree ):
 		if fix_attribute_func:
 			fix_attribute_func( x )
 		if y_original_color == Color.BLACK:
-			self.rb_delete_fixup( x )
+			self.delete_fixup( x )
 
 
 
-	def rb_delete_fixup(self, x ):
+	def delete_fixup(self, x ):
 		""" After deleting a node, restore the Red-Black properties on the subtree affected by the change.
 
 		:param x: the node whose ancestors should be fixed.
@@ -305,7 +308,7 @@ class RedBlackTree( bt.BinaryTree ):
 		if node_to_delete is None:
 			return None
 		value = node_to_delete.key
-		self.rb_delete( node_to_delete, fix_attribute_func )
+		self.delete_node( node_to_delete, fix_attribute_func )
 		
 		return value
 
@@ -456,7 +459,7 @@ class RedBlackTreeUniTest( unittest.TestCase ):
 		bst = RedBlackTree()
 
 		for key in (41,38,31,12,19,8):
-			bst.rb_insert( key )
+			bst.insert_key( key )
 		#bst.to_binary_tree().display()	
 
 		self.assertEqual( bst.to_array(), (38,(19, (12,8,None),31),41))
@@ -465,7 +468,7 @@ class RedBlackTreeUniTest( unittest.TestCase ):
 		bst = RedBlackTree()
 
 		for key in (3, 7, 10, 12, 14, 15, 16, 17,19,20, 21,23,26, 28,30,35,38,39,41,47):
-			bst.rb_insert( key )
+			bst.insert_key( key )
 		self.assertEqual( bst.to_array(), (17, (12, (7, 3, 10), (15, 14, 16)), (23, (20, 19, 21), (35, (28, 26, 30), (39, 38, (41, None, 47))))))
 	
 	
@@ -474,7 +477,7 @@ class RedBlackTreeUniTest( unittest.TestCase ):
 		bst = RedBlackTree()
 
 		for key in (11,2,14,15,1,7,5,8,4):
-			bst.rb_insert( key )
+			bst.insert_key( key )
 		bst.to_binary_tree().display()	
 		self.assertEqual( bst.to_array(), (7, (2, 1, (5, 4, None)), (11, 8, (14, None, 15))))
 	
@@ -483,13 +486,13 @@ class RedBlackTreeUniTest( unittest.TestCase ):
 		bst = RedBlackTree()
 
 		for key in (11,2,14,15,1,7,5,8,4):
-			bst.rb_insert( key )
+			bst.insert_key( key )
 		bst.to_binary_tree().display()	
 
-		bst.rb_delete( bst.root.left )
-		bst.rb_delete( bst.root.left )
-		bst.rb_delete( bst.root.left )
-		bst.rb_delete( bst.root.left )
+		bst.delete_node( bst.root.left )
+		bst.delete_node( bst.root.left )
+		bst.delete_node( bst.root.left )
+		bst.delete_node( bst.root.left )
 		self.assertEqual( bst.to_array(), (11, (7, None, 8), (14, None, 15)))
 	
 		bst.to_binary_tree().display()	
@@ -498,7 +501,7 @@ class RedBlackTreeUniTest( unittest.TestCase ):
 		
 		bst = RedBlackTree()
 		for key in (11,2,14,15,1,7,5,8,4):
-			bst.rb_insert( key )
+			bst.insert_key( key )
 		bst.to_binary_tree().display()	
 
 		self.assertEqual( bst.tree_minimum( bst.root ).key, 1)
@@ -506,7 +509,7 @@ class RedBlackTreeUniTest( unittest.TestCase ):
 	def test_tree_minimum_2(self):
 		
 		bst = RedBlackTree()
-		bst.rb_insert( 11 )
+		bst.insert_key( 11 )
 		bst.to_binary_tree().display()	
 
 		self.assertEqual( bst.tree_minimum( bst.root ).key, 11)

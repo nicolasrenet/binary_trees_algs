@@ -176,7 +176,7 @@ class IntervalTree( rbt.RedBlackTree ):
 		:type intrvl: Interval
 		"""
 		node = IntervalNode( intrvl )
-		self.insert_node( node )
+		super().insert_node( node, self.fix_max_up )
 
 	def insert_node( self, node):
 		"""
@@ -185,7 +185,7 @@ class IntervalTree( rbt.RedBlackTree ):
 		:param node: the interval node to be inserted
 		:type node: IntervalNode
 		"""
-		self.rb_insert_node( node, self.fix_max_up )
+		super().insert_node( node, self.fix_max_up )
 
 	def delete_interval(self, interval ):
 		"""
@@ -210,7 +210,7 @@ class IntervalTree( rbt.RedBlackTree ):
 		:param z: the node to be deleted
 		:type z: IntervalNode
 		"""
-		self.rb_delete( z, self.fix_max_up )
+		super().delete_node( z, self.fix_max_up )
 	
 	
 	def search_interval(self, interval):

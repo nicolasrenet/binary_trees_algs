@@ -108,7 +108,7 @@ class BST(bt.BinaryTree):
 				self.update_depth( v, v.parent.depth+1) 
 
 
-	def delete(self, z):
+	def delete_node(self, z):
 		"""
 		.. _delete:
 
@@ -142,7 +142,7 @@ class BST(bt.BinaryTree):
 		if node_to_delete is None:
 			return None
 		value = node_to_delete.key
-		self.delete( node_to_delete )
+		self.delete_node( node_to_delete )
 		return value
 		
 
@@ -347,7 +347,7 @@ class BST_UnitTest(unittest.TestCase):
 		print('	BEFORE: ')
 		bst.display()
 
-		bst.delete( bst.search(24) )
+		bst.delete_node( bst.search(24) )
 
 		print('	AFTER: ')
 		bst.display()
@@ -364,7 +364,7 @@ class BST_UnitTest(unittest.TestCase):
 		print('	BEFORE: ')
 		bst.display()
 
-		bst.delete( bst.search(3) )
+		bst.delete_node( bst.search(3) )
 
 		print('	AFTER: ')
 		bst.display()
@@ -381,7 +381,7 @@ class BST_UnitTest(unittest.TestCase):
 		print('	BEFORE: ')
 		bst.display()
 
-		bst.delete( bst.search(21) )
+		bst.delete_node( bst.search(21) )
 
 		print('	AFTER: ')
 		bst.display()
@@ -398,7 +398,7 @@ class BST_UnitTest(unittest.TestCase):
 		print('	BEFORE: ')
 		bst.display()
 
-		bst.delete( bst.search(15) )
+		bst.delete_node( bst.search(15) )
 
 		print('	AFTER: ')
 		bst.display()
