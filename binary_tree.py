@@ -12,8 +12,29 @@ class Node():
         self.left = left
         self.right = right
         self.parent = parent
-        self.depth=depth
 
+    @property 
+    def depth(self):
+        """ Compute the node's depth, i.e. length of the path from the root to this node.
+        """
+        x = self
+        depth=0
+    
+        while x.parent:
+            x = x.parent
+            depth += 1
+        return depth
+
+    @property
+    def height(self):
+        """ Compute the node's height, i.e. length of a longest path from the root to this node.
+        """
+        def compute_height(node):
+            if not node or (not node.left and not node.right):
+                return 0
+            return 1+max( compute_height(node.left), compute_height(node.right))
+
+        return compute_height(self)
     
     def add_left(self, left ):
         """ Helper function: create a L child  """
@@ -42,11 +63,29 @@ class BinaryTree():
         :type array:  tuple
         """
         self.root = root
-        self.height=-1
 
         if array is not None:
             self.update_from_array( array )
 
+    @property
+    def height(self):
+        if not self.root:
+            return -1
+        return self.root.height
+
+
+    def compute_height(self, node):
+        """
+        Recursively compute the height of a subtree
+
+        :param node: root of the subtree
+        :type node: Node
+        :return: the height of the subtree
+        :rtype: int
+        """
+        if not node or (not node.left and not node.right):
+            return 0
+        return 1+max( self.compute_height(node.left), self.compute_height(node.right))
 
     def list(self):
         """ Return a list of nodes, sorted by increasing order """
@@ -323,53 +362,30 @@ class BinaryTree():
         :type array: tuple
         """
     
-        
-    def update_from_array(self, array  ):
-        """ Build a binary tree from nested tuples 
-        
-        Ex. BinaryTree().update_from_array( ( 1,(2,3,4),(5,None,6) ) yields the following tree:
-
-                       1
-             __________/\________
-            2                   5
-          _/\                    \
-         3   4                    6
-
-        :param array: a list of the form ( key, ( left subtree ), (right subtree ))
-        :type array: tuple
-        """
-    
         def read_rec( triplet ):
             if not triplet:
                 return None
             if type( triplet ) is not tuple:
                 return Node( triplet )
             n = Node( triplet[0], read_rec(triplet[1]), read_rec(triplet[2]))
+
+            if n.left:
+                n.left.parent = n
+            if n.right:
+                n.right.parent = n
             return n
 
         self.root = read_rec( array )
-        self.height = self.compute_height(self.root)
-        self.update_depth(self.root, 0)
 
         return self
 
-    def compute_height(self, node):
-        """
-        Recursively compute the height of a subtree
-
-        :param node: root of the subtree
-        :type node: Node
-        :return: the height of the subtree
-        :rtype: int
-        """
-        if not node or (not node.left and not node.right):
-            return 0
-        return 1+max( self.compute_height(node.left), self.compute_height(node.right))
 
 
     def update_depth(self, node, depth):
         """ Update the depth attribute on the given node, and all its
         descendants
+
+        .. note:: *Deprecated*. The depth is now a dynamic property of each node.
 
         :param node: root of the subtree to be updated
         :param depth: value of the new depth attribute
